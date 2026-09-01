@@ -1,0 +1,1 @@
+# aguri_qrcode
