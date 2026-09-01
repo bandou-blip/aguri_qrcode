@@ -33,7 +33,6 @@
       text-align: center;
     }
 
-    /* ヘッダー・位置情報ステータス */
     .header-badge {
       background: var(--accent-color);
       color: #333;
@@ -46,7 +45,6 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-    /* レシピ画像エリア */
     .recipe-image-container {
       position: relative;
       width: 100%;
@@ -75,7 +73,6 @@
       color: #333;
     }
 
-    /* タイトル・キャッチコピー */
     h1 {
       font-size: 1.4rem;
       color: var(--primary-color);
@@ -93,7 +90,6 @@
       margin-bottom: 20px;
     }
 
-    /* ついで買いセクション */
     .cross-sell-section {
       background: #f0f7ff;
       border: 2px dashed #4ea8de;
@@ -130,15 +126,6 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.03);
     }
 
-    .item-list li:last-child {
-      margin-bottom: 0;
-    }
-
-    .item-icon {
-      margin-right: 8px;
-      font-size: 1.1rem;
-    }
-
     .item-location {
       margin-left: auto;
       font-size: 0.75rem;
@@ -148,19 +135,12 @@
       color: #4a5568;
     }
 
-    /* レシピ概要 */
     .recipe-details {
       text-align: left;
       border-top: 1px solid #eee;
       padding-top: 16px;
     }
 
-    .recipe-details h3 {
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-    }
-
-    /* GPS許可用ボタン */
     .location-btn {
       background-color: var(--primary-color);
       color: white;
@@ -171,50 +151,31 @@
       font-weight: bold;
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
-      transition: transform 0.2s;
-    }
-
-    .location-btn:active {
-      transform: scale(0.98);
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <div id="status-badge" class="header-badge">📍 現在地を取得中...</div>
+  <div id="status-badge" class="header-badge">📍 天気情報を読み込んでください</div>
 
   <div class="recipe-image-container">
-    <span class="weather-tag" id="weather-tag">☔ 雨・肌寒い日に</span>
-    <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80" alt="トマトスープ料理画像">
+    <span class="weather-tag" id="weather-tag">❓ 天気を取得してください</span>
+    <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80" alt="料理画像">
   </div>
 
   <h1>本日のフレッシュトマトで作る！<br>丸ごとトマトと挽き肉の濃厚スープ</h1>
 
-  <div class="ai-message">
-    今日は冷たい雨が降っていて少し肌寒いですね！冷え込む夕方には、トマトの旨味と温かいスープで体の中からしっかり温まりましょう♪
+  <div class="ai-message" id="weather-message">
+    下のボタンを押して、現在の天気に合わせたアドバイスを表示させましょう！
   </div>
 
   <div class="cross-sell-section">
-    <div class="cross-sell-title">
-      🛒 一緒に揃えてもっと美味しく！
-    </div>
+    <div class="cross-sell-title">🛒 一緒に揃えてもっと美味しく！</div>
     <ul class="item-list">
-      <li>
-        <span class="item-icon">🥩</span>
-        <span>合挽き肉 (200g)</span>
-        <span class="item-location">精肉コーナー</span>
-      </li>
-      <li>
-        <span class="item-icon">🧅</span>
-        <span>玉ねぎ (1個)</span>
-        <span class="item-location">野菜売り場</span>
-      </li>
-      <li>
-        <span class="item-icon">🧂</span>
-        <span>コンソメの素</span>
-        <span class="item-location">調味料コーナー</span>
-      </li>
+      <li><span style="margin-right:8px;">🥩</span><span>合挽き肉 (200g)</span><span class="item-location">精肉コーナー</span></li>
+      <li><span style="margin-right:8px;">🧅</span><span>玉ねぎ (1個)</span><span class="item-location">野菜売り場</span></li>
+      <li><span style="margin-right:8px;">🧂</span><span>コンソメの素</span><span class="item-location">調味料コーナー</span></li>
     </ul>
   </div>
 
@@ -228,36 +189,75 @@
   </div>
 
   <div style="margin-top: 20px;">
-    <button class="location-btn" onclick="getLocation()">現在地の天気を読み込む</button>
+    <button class="location-btn" onclick="getWeather()">現在地の天気を読み込む</button>
   </div>
 </div>
 
 <script>
-  // 位置情報を取得する処理
-  function getLocation() {
+  // 🔑 OpenWeatherMapのAPIキーを入力してください
+  const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
+
+  function getWeather() {
     const badge = document.getElementById('status-badge');
-    
-    if (navigator.geolocation) {
-      badge.innerText = "⏳ 位置情報を取得中...";
-      
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude.toFixed(2);
-          const lon = position.coords.longitude.toFixed(2);
-          
-          // 取得成功時のダミー表示（本来はここでAPIを叩きます）
-          badge.innerText = `📍 現在地を取得しました (${lat}, ${lon})`;
+    const weatherTag = document.getElementById('weather-tag');
+    const weatherMsg = document.getElementById('weather-message');
+
+    if (!navigator.geolocation) {
+      badge.innerText = "⚠️ GPS非対応のブラウザです";
+      return;
+    }
+
+    badge.innerText = "⏳ 位置情報を取得中...";
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        badge.innerText = "⏳ 天気データを取得中...";
+
+        try {
+          // OpenWeatherMap APIを呼び出し（日本語・摂氏表記指定）
+          const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric&lang=ja`;
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data.cod !== 200) {
+            throw new Error(data.message);
+          }
+
+          // 取得データの抽出
+          const cityName = data.name;
+          const temp = Math.round(data.main.temp);
+          const weatherDesc = data.weather[0].description;
+          const mainWeather = data.weather[0].main;
+
+          // 画面の書き換え
+          badge.innerText = `📍 ${cityName}：${weatherDesc} (${temp}℃)`;
           badge.style.backgroundColor = "#8ac926";
           badge.style.color = "#fff";
-        },
-        (error) => {
-          badge.innerText = "⚠️ 位置情報の取得に失敗しました";
+
+          weatherTag.innerText = `🌡️ ${weatherDesc}・${temp}℃`;
+
+          // 天候に応じた定型メッセージの切り替え（ダミー処理）
+          if (mainWeather === "Rain" || mainWeather === "Drizzle") {
+            weatherMsg.innerText = `今日は雨が降っていますね（${temp}℃）。温かいスープで体の中からしっかり温まりましょう♪`;
+          } else if (temp >= 25) {
+            weatherMsg.innerText = `今日は暑いですね！（${temp}℃）。冷やしたトマトでさっぱり栄養補給するのがおすすめです！`;
+          } else {
+            weatherMsg.innerText = `現在の気温は${temp}℃です。フレッシュなトマトを使って美味しい一品を作りましょう！`;
+          }
+
+        } catch (error) {
+          console.error(error);
+          badge.innerText = "⚠️ 天気情報の取得に失敗しました";
           badge.style.backgroundColor = "#ffca3a";
+          badge.style.color = "#333";
         }
-      );
-    } else {
-      badge.innerText = "⚠️ GPS非対応のブラウザです";
-    }
+      },
+      (error) => {
+        badge.innerText = "⚠️ 位置情報の利用が許可されませんでした";
+      }
+    );
   }
 </script>
 
