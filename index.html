@@ -1,8 +1,230 @@
-const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本日の天候おすすめレシピ</title>
+  <style>
+    :root {
+      --primary-color: #ff6b6b;
+      --accent-color: #ffd166;
+      --bg-color: #fff9f2;
+      --text-color: #4a4a4a;
+    }
 
-  // 🍳 気温帯ごとのレシピデータベース（各3つずつ用意）
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .header-badge {
+      background: var(--accent-color);
+      color: #333;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      display: inline-block;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .recipe-image-container {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .recipe-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .weather-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(4px);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      color: var(--primary-color);
+      margin: 8px 0 12px;
+    }
+
+    .ai-message {
+      background: #fff5f5;
+      border-left: 4px solid var(--primary-color);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      text-align: left;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .cross-sell-section {
+      background: #f0f7ff;
+      border: 2px dashed #4ea8de;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .cross-sell-title {
+      font-weight: bold;
+      color: #0077b6;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .item-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .item-list li {
+      background: #ffffff;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .item-icon {
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .item-name {
+      flex: 1;
+      text-align: left;
+      margin-right: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .item-location {
+      font-size: 0.75rem;
+      background: #e2e8f0;
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: #4a5568;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .recipe-details {
+      text-align: left;
+      border-top: 1px solid #eee;
+      padding-top: 16px;
+    }
+
+    .location-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="status-badge" class="header-badge">📍 天気情報を読み込んでください</div>
+
+  <div class="recipe-image-container">
+    <span class="weather-tag" id="weather-tag">❓ 天気を取得してください</span>
+    <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80" alt="料理画像">
+  </div>
+
+  <h1>本日のフレッシュトマトで作る！<br>丸ごとトマトと挽き肉の濃厚スープ</h1>
+
+  <div class="ai-message" id="weather-message">
+    下のボタンを押して、現在の天気に合わせたアドバイスを表示させましょう！
+  </div>
+
+  <div class="cross-sell-section">
+    <div class="cross-sell-title">🛒 一緒に揃えてもっと美味しく！</div>
+    <ul class="item-list">
+      <li>
+        <span class="item-icon">🥩</span>
+        <span class="item-name">合挽き肉 (200g)</span>
+        <span class="item-location">精肉コーナー</span>
+      </li>
+      <li>
+        <span class="item-icon">🧅</span>
+        <span class="item-name">玉ねぎ (1個)</span>
+        <span class="item-location">野菜売り場</span>
+      </li>
+      <li>
+        <span class="item-icon">🧂</span>
+        <span class="item-name">コンソメの素</span>
+        <span class="item-location">調味料コーナー</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="recipe-details">
+    <h3>🍳 調理時間：約15分</h3>
+    <p style="font-size: 0.85rem; color: #666; line-height: 1.6;">
+      1. 玉ねぎと挽き肉を炒める。<br>
+      2. 水、コンソメ、くり抜いたトマトを投入。<br>
+      3. 弱火で10分煮込めば、トロトロスープの完成！
+    </p>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <button class="location-btn" onclick="getWeather()">現在地の天気を読み込む</button>
+  </div>
+</div>
+
+<script>
+  const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
+
   const recipeDatabase = {
-    // 10℃未満（極寒・極冷）
     cold: [
       {
         title: "丸ごとトマトと挽き肉の濃厚アツアツスープ",
@@ -31,8 +253,6 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
         steps: "1. トマトの中身をくり抜き、炒めたベーコンとしめじを詰める。<br>2. チーズをたっぷり乗せる。<br>3. トースターで10分焼いて焦げ目がつけば完成！"
       }
     ],
-
-    // 10℃〜20℃（肌寒い〜快適）
     cool: [
       {
         title: "じっくり旨味を引き出す トマトと鶏肉の煮込み",
@@ -61,11 +281,9 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
         steps: "1. 茄子とトマトを一口大に切る。<br>2. 茄子をサッと油で揚げ（または多めの油で焼く）。<br>3. 温めためんつゆに浸し、大葉を添えて完成！"
       }
     ],
-
-    // 20℃〜30℃（暖かい〜やや暑い）
     warm: [
       {
-        title: "フレッシュトマトとツナのバジルフレッシュパスタ",
+        title: "フレッシュトマトとツナのバジルパスタ",
         tag: "🌤️ 爽やかな陽気にピッタリ！",
         image: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80",
         message: "暖かくなってきた今日にぴったり！加熱しすぎずフレッシュなトマトの食感を楽しむ軽やかなパスタです。",
@@ -76,49 +294,21 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
         ],
         time: "約12分",
         steps: "1. パスタを茹でる。<br>2. ボウルで角切りトマト、ツナ、オリーブオイル、塩を和える。<br>3. 茹で上がったパスタと絡めて完成！"
-      },
-      {
-        title: "シャキッと美味しい トマトと豚しゃぶのおかずサラダ",
-        tag: "🌤️ 暖かく栄養補給したい日に",
-        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
-        message: "ビタミンとタンパク質がしっかり摂れるヘルシーメニュー。ポン酢でさっぱり味わえます。",
-        crossSell: [
-          { icon: "🥓", name: "豚しゃぶ用肉 (200g)", location: "精肉コーナー" },
-          { icon: "🥬", name: "レタス (1/2個)", location: "野菜売り場" },
-          { icon: "🍾", name: "味ぽん", location: "調味料コーナー" }
-        ],
-        time: "約10分",
-        steps: "1. 豚肉をサッと茹でて冷水にとる。<br>2. 皿にレタス、トマト、豚肉を盛り付ける。<br>3. お好みのドレッシングやポン酢をかけて完成！"
       }
     ],
-
-    // 30℃以上（猛暑・酷暑）
     hot: [
       {
-        title: "火を使わない！完熟トマトと大葉の冷製和風パスタ",
+        title: "火を使わない！冷製和風パスタ",
         tag: "☀️ 暑い夏に！ひんやりサッパリ",
         image: "https://images.unsplash.com/photo-1595295333158-4742f28fbd85?auto=format&fit=crop&w=800&q=80",
-        message: "うだるような暑さの日はキッチンの火を使いたくない！冷やしたトマトとツナで涼しくエネルギーチャージしましょう。",
+        message: "うだるような暑さの日はキッチンの火を使いたくない！冷やしたトマトで爽やかに味わいましょう。",
         crossSell: [
-          { icon: "🌱", name: "新鮮な大葉 (1パック)", location: "野菜売り場" },
-          { icon: "🐟", name: "ツナ缶 (ライト)", location: "缶詰コーナー" },
+          { icon: "🌱", name: "大葉 (1パック)", location: "野菜売り場" },
+          { icon: "🐟", name: "ツナ缶", location: "缶詰コーナー" },
           { icon: "🍋", name: "レモン果汁", location: "調味料コーナー" }
         ],
         time: "約10分",
-        steps: "1. トマトをサイコロ状に切り、冷蔵庫で冷やしておく。<br>2. 茹でて冷水で締めた麺と和える。<br>3. 刻んだ大葉をたっぷり乗せて完成！"
-      },
-      {
-        title: "食欲UP！トマトとキュウリのやみつき出汁冷やっこ",
-        tag: "☀️ 暑い日の超時短さっぱりメニュー",
-        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
-        message: "暑さで食欲がない日でもつるりと食べられる！トマトのクエン酸で疲労回復にも効果抜群です。",
-        crossSell: [
-          { icon: "⬜", name: "絹ごし豆腐 (1パック)", location: "豆腐コーナー" },
-          { icon: "🥒", name: "きゅうり (1本)", location: "野菜売り場" },
-          { icon: "🫒", name: "ごま油", location: "調味料コーナー" }
-        ],
-        time: "約5分",
-        steps: "1. トマトときゅうりを小さめの角切りにする。<br>2. ごま油とめんつゆで和える。<br>3. 冷えた豆腐の上にたっぷり乗せて完成！"
+        steps: "1. トマトをサイコロ状に切り、冷蔵庫で冷やす。<br>2. 茹でて冷水で締めた麺と和える。<br>3. 大葉を添えて完成！"
       }
     ]
   };
@@ -158,7 +348,6 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
           badge.style.backgroundColor = "#8ac926";
           badge.style.color = "#fff";
 
-          // --- 気温帯に応じたレシピの選定ロジック ---
           let category = "cool";
           if (temp < 10) {
             category = "cold";
@@ -170,17 +359,14 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
             category = "hot";
           }
 
-          // 選ばれたカテゴリーの中からランダムで1つレシピをピックアップ
           const recipes = recipeDatabase[category];
           const selectedRecipe = recipes[Math.floor(Math.random() * recipes.length)];
 
-          // 画面要素の動的書き換え
           weatherTag.innerText = selectedRecipe.tag;
           document.querySelector('.recipe-image-container img').src = selectedRecipe.image;
           document.querySelector('h1').innerHTML = selectedRecipe.title;
           weatherMsg.innerText = `【現在の気温: ${temp}℃】${selectedRecipe.message}`;
 
-          // ついで買いリストの自動生成
           const itemListHtml = selectedRecipe.crossSell.map(item => `
             <li>
               <span class="item-icon">${item.icon}</span>
@@ -190,7 +376,6 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
           `).join('');
           document.querySelector('.item-list').innerHTML = itemListHtml;
 
-          // レシピ詳細の自動生成
           document.querySelector('.recipe-details').innerHTML = `
             <h3>🍳 調理時間：${selectedRecipe.time}</h3>
             <p style="font-size: 0.85rem; color: #666; line-height: 1.6;">
@@ -210,3 +395,7 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
       }
     );
   }
+</script>
+
+</body>
+</html>
