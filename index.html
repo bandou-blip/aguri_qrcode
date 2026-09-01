@@ -1,229 +1,127 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>本日の天候おすすめレシピ</title>
-  <style>
-    :root {
-      --primary-color: #ff6b6b;
-      --accent-color: #ffd166;
-      --bg-color: #fff9f2;
-      --text-color: #4a4a4a;
-    }
+const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
 
-    body {
-      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 16px;
-      display: flex;
-      justify-content: center;
-    }
+  // 🍳 気温帯ごとのレシピデータベース（各3つずつ用意）
+  const recipeDatabase = {
+    // 10℃未満（極寒・極冷）
+    cold: [
+      {
+        title: "丸ごとトマトと挽き肉の濃厚アツアツスープ",
+        tag: "❄️ 寒さに負けない熱々スープ",
+        image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80",
+        message: "身体が冷え込む今日はお鍋感覚で温まりましょう！トマトの酸味と挽き肉の旨味が溶け込んだスープです。",
+        crossSell: [
+          { icon: "🥩", name: "合挽き肉 (200g)", location: "精肉コーナー" },
+          { icon: "🧅", name: "玉ねぎ (1個)", location: "野菜売り場" },
+          { icon: "🧂", name: "コンソメの素", location: "調味料コーナー" }
+        ],
+        time: "約15分",
+        steps: "1. 玉ねぎと挽き肉を炒める。<br>2. 水、コンソメ、くり抜いたトマトを投入。<br>3. 弱火で10分煮込めば完成！"
+      },
+      {
+        title: "とろ〜りチーズのあったかトマトグラタン",
+        tag: "❄️ 寒さに負けないアツアツ料理",
+        image: "https://images.unsplash.com/photo-1572449043416-55f4685c9bb7?auto=format&fit=crop&w=800&q=80",
+        message: "寒い日はオーブン料理が一番！くり抜いたトマトに具材を入れて焼き上げる香ばしい一品です。",
+        crossSell: [
+          { icon: "🧀", name: "ピザ用チーズ", location: "乳製品コーナー" },
+          { icon: "🥓", name: "ベーコン", location: "加工肉コーナー" },
+          { icon: "🍄", name: "しめじ (1パック)", location: "野菜売り場" }
+        ],
+        time: "約20分",
+        steps: "1. トマトの中身をくり抜き、炒めたベーコンとしめじを詰める。<br>2. チーズをたっぷり乗せる。<br>3. トースターで10分焼いて焦げ目がつけば完成！"
+      }
+    ],
 
-    .container {
-      width: 100%;
-      max-width: 480px;
-      background: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-      padding: 20px;
-      box-sizing: border-box;
-      text-align: center;
-    }
+    // 10℃〜20℃（肌寒い〜快適）
+    cool: [
+      {
+        title: "じっくり旨味を引き出す トマトと鶏肉の煮込み",
+        tag: "🍂 肌寒い日に嬉しいほっこり煮込み",
+        image: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=800&q=80",
+        message: "過ごしやすいけれど少し肌寒い季節。ジューシーな鶏肉とトマトの旨味がベストマッチなメインディッシュです。",
+        crossSell: [
+          { icon: "🍗", name: "鶏もも肉 (300g)", location: "精肉コーナー" },
+          { icon: "🧄", name: "にんにく", location: "野菜売り場" },
+          { icon: "🫒", name: "オリーブオイル", location: "調味料コーナー" }
+        ],
+        time: "約25分",
+        steps: "1. 鶏肉に焼き目をつける。<br>2. 刻んだトマト、にんにく、オリーブオイルを加える。<br>3. 蓋をして15分ほど弱火で煮込めば完成！"
+      },
+      {
+        title: "和風だし香る トマトと茄子の揚げ出し風",
+        tag: "🍂 肌寒い日にぴったりの和風おかず",
+        image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80",
+        message: "和風だしとトマトの酸味は相性抜群！温かいお出汁をたっぷり含ませて召し上がれ。",
+        crossSell: [
+          { icon: "🍆", name: "長茄子 (2本)", location: "野菜売り場" },
+          { icon: "🍲", name: "めんつゆ", location: "調味料コーナー" },
+          { icon: "🌱", name: "大葉", location: "野菜売り場" }
+        ],
+        time: "約15分",
+        steps: "1. 茄子とトマトを一口大に切る。<br>2. 茄子をサッと油で揚げ（または多めの油で焼く）。<br>3. 温めためんつゆに浸し、大葉を添えて完成！"
+      }
+    ],
 
-    .header-badge {
-      background: var(--accent-color);
-      color: #333;
-      font-weight: bold;
-      padding: 8px 16px;
-      border-radius: 50px;
-      font-size: 0.9rem;
-      display: inline-block;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+    // 20℃〜30℃（暖かい〜やや暑い）
+    warm: [
+      {
+        title: "フレッシュトマトとツナのバジルフレッシュパスタ",
+        tag: "🌤️ 爽やかな陽気にピッタリ！",
+        image: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80",
+        message: "暖かくなってきた今日にぴったり！加熱しすぎずフレッシュなトマトの食感を楽しむ軽やかなパスタです。",
+        crossSell: [
+          { icon: "🐟", name: "ツナ缶 (1缶)", location: "缶詰コーナー" },
+          { icon: "🍝", name: "パスタ麺 (1.6mm)", location: "乾物コーナー" },
+          { icon: "🌿", name: "乾燥バジル", location: "スパイスコーナー" }
+        ],
+        time: "約12分",
+        steps: "1. パスタを茹でる。<br>2. ボウルで角切りトマト、ツナ、オリーブオイル、塩を和える。<br>3. 茹で上がったパスタと絡めて完成！"
+      },
+      {
+        title: "シャキッと美味しい トマトと豚しゃぶのおかずサラダ",
+        tag: "🌤️ 暖かく栄養補給したい日に",
+        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
+        message: "ビタミンとタンパク質がしっかり摂れるヘルシーメニュー。ポン酢でさっぱり味わえます。",
+        crossSell: [
+          { icon: "🥓", name: "豚しゃぶ用肉 (200g)", location: "精肉コーナー" },
+          { icon: "🥬", name: "レタス (1/2個)", location: "野菜売り場" },
+          { icon: "🍾", name: "味ぽん", location: "調味料コーナー" }
+        ],
+        time: "約10分",
+        steps: "1. 豚肉をサッと茹でて冷水にとる。<br>2. 皿にレタス、トマト、豚肉を盛り付ける。<br>3. お好みのドレッシングやポン酢をかけて完成！"
+      }
+    ],
 
-    .recipe-image-container {
-      position: relative;
-      width: 100%;
-      height: 220px;
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-
-    .recipe-image-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .weather-tag {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(4px);
-      padding: 6px 12px;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 0.85rem;
-      color: #333;
-    }
-
-    h1 {
-      font-size: 1.4rem;
-      color: var(--primary-color);
-      margin: 8px 0 12px;
-    }
-
-    .ai-message {
-      background: #fff5f5;
-      border-left: 4px solid var(--primary-color);
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      text-align: left;
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
-
-    .cross-sell-section {
-      background: #f0f7ff;
-      border: 2px dashed #4ea8de;
-      border-radius: 16px;
-      padding: 16px;
-      text-align: left;
-      margin-bottom: 20px;
-    }
-
-    .cross-sell-title {
-      font-weight: bold;
-      color: #0077b6;
-      font-size: 1.05rem;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .item-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    /* --- 列のずれを強力に防ぐFlexレイアウト --- */
-    .item-list li {
-      background: #ffffff;
-      padding: 10px 12px;
-      border-radius: 10px;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between; /* 左右いっぱいに綺麗に配分 */
-      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-    }
-
-    .item-icon {
-      margin-right: 8px;
-      flex-shrink: 0;
-    }
-
-    .item-name {
-      flex: 1; /* 空きスペースを全自動で埋める */
-      text-align: left;
-      margin-right: 8px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis; /* 文字が長すぎる場合は「...」にして崩れを防止 */
-    }
-
-    .item-location {
-      font-size: 0.75rem;
-      background: #e2e8f0;
-      padding: 3px 8px;
-      border-radius: 6px;
-      color: #4a5568;
-      white-space: nowrap;
-      flex-shrink: 0; /* タグが縮んで潰れるのを防ぐ */
-    }
-
-    .recipe-details {
-      text-align: left;
-      border-top: 1px solid #eee;
-      padding-top: 16px;
-    }
-
-    .location-btn {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 50px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
-    }
-  </style>
-</head>
-<body>
-
-<div class="container">
-  <div id="status-badge" class="header-badge">📍 天気情報を読み込んでください</div>
-
-  <div class="recipe-image-container">
-    <span class="weather-tag" id="weather-tag">❓ 天気を取得してください</span>
-    <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80" alt="料理画像">
-  </div>
-
-  <h1>本日のフレッシュトマトで作る！<br>丸ごとトマトと挽き肉の濃厚スープ</h1>
-
-  <div class="ai-message" id="weather-message">
-    下のボタンを押して、現在の天気に合わせたアドバイスを表示させましょう！
-  </div>
-
-  <div class="cross-sell-section">
-    <div class="cross-sell-title">🛒 一緒に揃えてもっと美味しく！</div>
-    <ul class="item-list">
-      <li>
-        <span class="item-icon">🥩</span>
-        <span class="item-name">合挽き肉 (200g)</span>
-        <span class="item-location">精肉コーナー</span>
-      </li>
-      <li>
-        <span class="item-icon">🧅</span>
-        <span class="item-name">玉ねぎ (1個)</span>
-        <span class="item-location">野菜売り場</span>
-      </li>
-      <li>
-        <span class="item-icon">🧂</span>
-        <span class="item-name">コンソメの素</span>
-        <span class="item-location">調味料コーナー</span>
-      </li>
-    </ul>
-  </div>
-
-  <div class="recipe-details">
-    <h3>🍳 調理時間：約15分</h3>
-    <p style="font-size: 0.85rem; color: #666; line-height: 1.6;">
-      1. 玉ねぎと挽き肉を炒める。<br>
-      2. 水、コンソメ、くり抜いたトマトを投入。<br>
-      3. 弱火で10分煮込めば、トロトロスープの完成！
-    </p>
-  </div>
-
-  <div style="margin-top: 20px;">
-    <button class="location-btn" onclick="getWeather()">現在地の天気を読み込む</button>
-  </div>
-</div>
-
-<script>
-  const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
+    // 30℃以上（猛暑・酷暑）
+    hot: [
+      {
+        title: "火を使わない！完熟トマトと大葉の冷製和風パスタ",
+        tag: "☀️ 暑い夏に！ひんやりサッパリ",
+        image: "https://images.unsplash.com/photo-1595295333158-4742f28fbd85?auto=format&fit=crop&w=800&q=80",
+        message: "うだるような暑さの日はキッチンの火を使いたくない！冷やしたトマトとツナで涼しくエネルギーチャージしましょう。",
+        crossSell: [
+          { icon: "🌱", name: "新鮮な大葉 (1パック)", location: "野菜売り場" },
+          { icon: "🐟", name: "ツナ缶 (ライト)", location: "缶詰コーナー" },
+          { icon: "🍋", name: "レモン果汁", location: "調味料コーナー" }
+        ],
+        time: "約10分",
+        steps: "1. トマトをサイコロ状に切り、冷蔵庫で冷やしておく。<br>2. 茹でて冷水で締めた麺と和える。<br>3. 刻んだ大葉をたっぷり乗せて完成！"
+      },
+      {
+        title: "食欲UP！トマトとキュウリのやみつき出汁冷やっこ",
+        tag: "☀️ 暑い日の超時短さっぱりメニュー",
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+        message: "暑さで食欲がない日でもつるりと食べられる！トマトのクエン酸で疲労回復にも効果抜群です。",
+        crossSell: [
+          { icon: "⬜", name: "絹ごし豆腐 (1パック)", location: "豆腐コーナー" },
+          { icon: "🥒", name: "きゅうり (1本)", location: "野菜売り場" },
+          { icon: "🫒", name: "ごま油", location: "調味料コーナー" }
+        ],
+        time: "約5分",
+        steps: "1. トマトときゅうりを小さめの角切りにする。<br>2. ごま油とめんつゆで和える。<br>3. 冷えた豆腐の上にたっぷり乗せて完成！"
+      }
+    ]
+  };
 
   function getWeather() {
     const badge = document.getElementById('status-badge');
@@ -255,21 +153,50 @@
           const cityName = data.name;
           const temp = Math.round(data.main.temp);
           const weatherDesc = data.weather[0].description;
-          const mainWeather = data.weather[0].main;
 
           badge.innerText = `📍 ${cityName}：${weatherDesc} (${temp}℃)`;
           badge.style.backgroundColor = "#8ac926";
           badge.style.color = "#fff";
 
-          weatherTag.innerText = `🌡️ ${weatherDesc}・${temp}℃`;
-
-          if (mainWeather === "Rain" || mainWeather === "Drizzle") {
-            weatherMsg.innerText = `今日は雨が降っていますね（${temp}℃）。温かいスープで体の中からしっかり温まりましょう♪`;
-          } else if (temp >= 25) {
-            weatherMsg.innerText = `今日は暑いですね！（${temp}℃）。冷やしたトマトでさっぱり栄養補給するのがおすすめです！`;
-          } else {
-            weatherMsg.innerText = `現在の気温は${temp}℃です。フレッシュなトマトを使って美味しい一品を作りましょう！`;
+          // --- 気温帯に応じたレシピの選定ロジック ---
+          let category = "cool";
+          if (temp < 10) {
+            category = "cold";
+          } else if (temp >= 10 && temp < 20) {
+            category = "cool";
+          } else if (temp >= 20 && temp < 30) {
+            category = "warm";
+          } else if (temp >= 30) {
+            category = "hot";
           }
+
+          // 選ばれたカテゴリーの中からランダムで1つレシピをピックアップ
+          const recipes = recipeDatabase[category];
+          const selectedRecipe = recipes[Math.floor(Math.random() * recipes.length)];
+
+          // 画面要素の動的書き換え
+          weatherTag.innerText = selectedRecipe.tag;
+          document.querySelector('.recipe-image-container img').src = selectedRecipe.image;
+          document.querySelector('h1').innerHTML = selectedRecipe.title;
+          weatherMsg.innerText = `【現在の気温: ${temp}℃】${selectedRecipe.message}`;
+
+          // ついで買いリストの自動生成
+          const itemListHtml = selectedRecipe.crossSell.map(item => `
+            <li>
+              <span class="item-icon">${item.icon}</span>
+              <span class="item-name">${item.name}</span>
+              <span class="item-location">${item.location}</span>
+            </li>
+          `).join('');
+          document.querySelector('.item-list').innerHTML = itemListHtml;
+
+          // レシピ詳細の自動生成
+          document.querySelector('.recipe-details').innerHTML = `
+            <h3>🍳 調理時間：${selectedRecipe.time}</h3>
+            <p style="font-size: 0.85rem; color: #666; line-height: 1.6;">
+              ${selectedRecipe.steps}
+            </p>
+          `;
 
         } catch (error) {
           console.error(error);
@@ -283,7 +210,3 @@
       }
     );
   }
-</script>
-
-</body>
-</html>
