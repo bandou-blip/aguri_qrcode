@@ -115,6 +115,7 @@
       margin: 0;
     }
 
+    /* --- 列のずれを強力に防ぐFlexレイアウト --- */
     .item-list li {
       background: #ffffff;
       padding: 10px 12px;
@@ -123,16 +124,32 @@
       font-size: 0.9rem;
       display: flex;
       align-items: center;
+      justify-content: space-between; /* 左右いっぱいに綺麗に配分 */
       box-shadow: 0 2px 4px rgba(0,0,0,0.03);
     }
 
+    .item-icon {
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .item-name {
+      flex: 1; /* 空きスペースを全自動で埋める */
+      text-align: left;
+      margin-right: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; /* 文字が長すぎる場合は「...」にして崩れを防止 */
+    }
+
     .item-location {
-      margin-left: auto;
       font-size: 0.75rem;
       background: #e2e8f0;
       padding: 3px 8px;
       border-radius: 6px;
       color: #4a5568;
+      white-space: nowrap;
+      flex-shrink: 0; /* タグが縮んで潰れるのを防ぐ */
     }
 
     .recipe-details {
@@ -173,9 +190,21 @@
   <div class="cross-sell-section">
     <div class="cross-sell-title">🛒 一緒に揃えてもっと美味しく！</div>
     <ul class="item-list">
-      <li><span style="margin-right:8px;">🥩</span><span>合挽き肉 (200g)</span><span class="item-location">精肉コーナー</span></li>
-      <li><span style="margin-right:8px;">🧅</span><span>玉ねぎ (1個)</span><span class="item-location">野菜売り場</span></li>
-      <li><span style="margin-right:8px;">🧂</span><span>コンソメの素</span><span class="item-location">調味料コーナー</span></li>
+      <li>
+        <span class="item-icon">🥩</span>
+        <span class="item-name">合挽き肉 (200g)</span>
+        <span class="item-location">精肉コーナー</span>
+      </li>
+      <li>
+        <span class="item-icon">🧅</span>
+        <span class="item-name">玉ねぎ (1個)</span>
+        <span class="item-location">野菜売り場</span>
+      </li>
+      <li>
+        <span class="item-icon">🧂</span>
+        <span class="item-name">コンソメの素</span>
+        <span class="item-location">調味料コーナー</span>
+      </li>
     </ul>
   </div>
 
@@ -194,7 +223,6 @@
 </div>
 
 <script>
-  // 🔑 OpenWeatherMapのAPIキーを入力してください
   const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
 
   function getWeather() {
@@ -216,7 +244,6 @@
         badge.innerText = "⏳ 天気データを取得中...";
 
         try {
-          // OpenWeatherMap APIを呼び出し（日本語・摂氏表記指定）
           const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric&lang=ja`;
           const response = await fetch(url);
           const data = await response.json();
@@ -225,20 +252,17 @@
             throw new Error(data.message);
           }
 
-          // 取得データの抽出
           const cityName = data.name;
           const temp = Math.round(data.main.temp);
           const weatherDesc = data.weather[0].description;
           const mainWeather = data.weather[0].main;
 
-          // 画面の書き換え
           badge.innerText = `📍 ${cityName}：${weatherDesc} (${temp}℃)`;
           badge.style.backgroundColor = "#8ac926";
           badge.style.color = "#fff";
 
           weatherTag.innerText = `🌡️ ${weatherDesc}・${temp}℃`;
 
-          // 天候に応じた定型メッセージの切り替え（ダミー処理）
           if (mainWeather === "Rain" || mainWeather === "Drizzle") {
             weatherMsg.innerText = `今日は雨が降っていますね（${temp}℃）。温かいスープで体の中からしっかり温まりましょう♪`;
           } else if (temp >= 25) {
@@ -249,7 +273,7 @@
 
         } catch (error) {
           console.error(error);
-          badge.innerText = "⚠️ 天気情報の取得に失敗しました";
+          badge.innerText = `⚠️ エラー: ${error.message}`;
           badge.style.backgroundColor = "#ffca3a";
           badge.style.color = "#333";
         }
