@@ -76,7 +76,7 @@
     }
 
     h1 {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       color: var(--primary-color);
       margin: 8px 0 12px;
     }
@@ -86,10 +86,49 @@
       border-left: 4px solid var(--primary-color);
       padding: 12px;
       border-radius: 8px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       text-align: left;
       line-height: 1.5;
       margin-bottom: 20px;
+    }
+
+    /* 他のレシピ選択ボタンエリア */
+    .other-recipes-section {
+      display: none;
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .other-recipes-title {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .other-recipe-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .other-recipe-btn:hover, .other-recipe-btn.active {
+      background: #fff0f0;
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      font-weight: bold;
     }
 
     .cross-sell-section {
@@ -104,11 +143,8 @@
     .cross-sell-title {
       font-weight: bold;
       color: #0077b6;
-      font-size: 1.05rem;
+      font-size: 1rem;
       margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .item-list {
@@ -119,38 +155,23 @@
 
     .item-list li {
       background: #ffffff;
-      padding: 10px 12px;
+      padding: 8px 12px;
       border-radius: 10px;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
     }
 
-    .item-icon {
-      margin-right: 8px;
-      flex-shrink: 0;
-    }
-
-    .item-name {
-      flex: 1;
-      text-align: left;
-      margin-right: 8px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
+    .item-icon { margin-right: 8px; }
+    .item-name { flex: 1; text-align: left; }
     .item-location {
       font-size: 0.75rem;
       background: #e2e8f0;
-      padding: 3px 8px;
+      padding: 2px 6px;
       border-radius: 6px;
       color: #4a5568;
-      white-space: nowrap;
-      flex-shrink: 0;
     }
 
     .recipe-details {
@@ -188,6 +209,12 @@
     下のボタンを押して、現在の天気に合わせたアドバイスを表示させましょう！
   </div>
 
+  <!-- 位置情報取得後に表示される他レシピ切替タブ -->
+  <div class="other-recipes-section" id="other-recipes-section">
+    <div class="other-recipes-title">💡 気温に合わせたその他のコラボレシピ（クリックで切り替え）:</div>
+    <div id="other-recipe-buttons"></div>
+  </div>
+
   <div class="cross-sell-section">
     <div class="cross-sell-title">🛒 一緒に揃えてもっと美味しく！</div>
     <ul class="item-list">
@@ -218,145 +245,157 @@
   const urlParams = new URLSearchParams(window.location.search);
   const currentItem = urlParams.get('item') || 'tomato';
 
-  // 初期画面設定
+  // 1. 位置情報取得前（初期表示）の画像指定
   const mainImgEl = document.getElementById('main-image');
   if (currentItem === 'grape') {
-    mainImgEl.src = "grape-warm.png";
+    mainImgEl.src = "grape.png";
     document.getElementById('recipe-title').innerHTML = "岡山産ブドウ×大阪特産！<br>コラボレシピ";
   } else {
-    mainImgEl.src = "tomato-warm.png";
+    mainImgEl.src = "tomato.png";
     document.getElementById('recipe-title').innerHTML = "北海道産トマト×大阪特産！<br>コラボレシピ";
   }
 
-  // 🍳 レシピデータベース（すべて .png 対応）
+  // 🍳 レシピデータベース（全4区分）
   const recipeDatabase = {
     tomato: {
-      cold: [
-        {
-          title: "北海道産トマトと大阪泉州タマネギの濃厚あつあつミネストローネ",
-          tag: "🍅 北海道×大阪！からだ温まるスープ",
-          image: "tomato-cold.png",
-          message: "大阪の街も冷え込む今日はお鍋感覚で温まりましょう！北海道産トマトの甘みと炒めた泉州タマネギのコクが溶け込んだスープです。",
-          crossSell: [
-            { icon: "🧅", name: "泉州タマネギ", location: "地場野菜コーナー" },
-            { icon: "🥩", name: "合挽き肉 (200g)", location: "精肉コーナー" },
-            { icon: "🧂", name: "コンソメの素", location: "調味料コーナー" }
-          ],
-          time: "約15分",
-          steps: "1. 泉州タマネギと挽き肉をしっかり炒める。<br>2. 水、コンソメ、角切りにした北海道トマトを加える。<br>3. 弱火で10分ほど煮込めば完成！"
-        }
-      ],
-      cool: [
-        {
-          title: "北海道産トマトと大阪産なにわ黒牛の煮込みハンバーグ",
-          tag: "🍅 ほっこり温まる贅沢ディナー",
-          image: "tomato-cool.png",
-          message: "少し肌寒い大阪の夕方。なにわ黒牛のジューシーな肉汁と、北海道産トマトの濃厚な旨味ソースが相性抜群です。",
-          crossSell: [
-            { icon: "🥩", name: "なにわ黒牛挽き肉", location: "精肉コーナー" },
-            { icon: "🧄", name: "にんにく", location: "野菜売り場" }
-          ],
-          time: "約25分",
-          steps: "1. ハンバーグを作り両面に焼き目をつける。<br>2. 潰した北海道トマト、にんにく、調味料を加える。<br>3. 蓋をして15分弱火でじっくり煮込む。"
-        }
-      ],
-      warm: [
-        {
-          title: "北海道産トマトと大阪泉州水ナスのフレッシュバジルパスタ",
-          tag: "🍅 陽気な日にピッタリのパスタ",
-          image: "tomato-warm.png",
-          message: "暖かくなってきた今日にぴったり！加熱しすぎずフレッシュな北海道トマトと生で甘い泉州水ナスを合わせる軽やかなパスタです。",
-          crossSell: [
-            { icon: "🍆", name: "泉州水ナス", location: "地場野菜コーナー" },
-            { icon: "🍝", name: "パスタ麺", location: "乾物コーナー" },
-            { icon: "🌿", name: "フレッシュバジル", location: "野菜売り場" }
-          ],
-          time: "約12分",
-          steps: "1. パスタを茹でる。<br>2. ボウルで角切りトマト、一口大に手で裂いた水ナス、オリーブオイルを和える。<br>3. 茹で上がったパスタとバジルを加えて絡めて完成！"
-        }
-      ],
-      hot: [
-        {
-          title: "北海道産トマトと大阪・毛馬きゅうりのひんやり冷製パスタ",
-          tag: "🍅 暑い日にひんやりサッパリ",
-          image: "tomato-hot.png",
-          message: "暑い日でもツルッと食べられる！しっかり冷やした北海道トマトと、大阪伝統のシャキシャキ毛馬きゅうりで元気チャージ！",
-          crossSell: [
-            { icon: "🥒", name: "毛馬きゅうり（またはキュウリ）", location: "野菜売り場" },
-            { icon: "🐟", name: "ツナ缶", location: "缶詰コーナー" },
-            { icon: "🌱", name: "大葉", location: "野菜売り場" }
-          ],
-          time: "約10分",
-          steps: "1. トマトときゅうりを細かく切り冷やす。<br>2. 茹でて冷水で締めた麺、ツナと和える。<br>3. 大葉を添えて完成！"
-        }
-      ]
+      cold: {
+        title: "北海道産トマトと大阪泉州タマネギの濃厚あつあつミネストローネ",
+        tag: "❄️ 寒さに負けない熱々スープ",
+        image: "tomato-cold.png",
+        message: "大阪の街も冷え込む今日はお鍋感覚で温まりましょう！北海道産トマトの甘みと炒めた泉州タマネギのコクが溶け込んだスープです。",
+        crossSell: [
+          { icon: "🧅", name: "泉州タマネギ", location: "地場野菜コーナー" },
+          { icon: "🥩", name: "合挽き肉 (200g)", location: "精肉コーナー" },
+          { icon: "🧂", name: "コンソメの素", location: "調味料コーナー" }
+        ],
+        time: "約15分",
+        steps: "1. 泉州タマネギと挽き肉をしっかり炒める。<br>2. 水、コンソメ、角切りにした北海道トマトを加える。<br>3. 弱火で10分ほど煮込めば完成！"
+      },
+      cool: {
+        title: "北海道産トマトと大阪産なにわ黒牛の煮込みハンバーグ",
+        tag: "🍂 肌寒い日に嬉しい煮込み",
+        image: "tomato-cool.png",
+        message: "少し肌寒い大阪の夕方。なにわ黒牛のジューシーな肉汁と、北海道産トマトの濃厚な旨味ソースが相性抜群です。",
+        crossSell: [
+          { icon: "🥩", name: "なにわ黒牛挽き肉", location: "精肉コーナー" },
+          { icon: "🧄", name: "にんにく", location: "野菜売り場" }
+        ],
+        time: "約25分",
+        steps: "1. ハンバーグを作り両面に焼き目をつける。<br>2. 潰した北海道トマト、にんにく、調味料を加える。<br>3. 蓋をして15分弱火でじっくり煮込む。"
+      },
+      warm: {
+        title: "北海道産トマトと大阪泉州水ナスのフレッシュバジルパスタ",
+        tag: "🌤️ 陽気な日にピッタリのパスタ",
+        image: "tomato-warm.png",
+        message: "暖かくなってきた今日にぴったり！加熱しすぎずフレッシュな北海道トマトと生で甘い泉州水ナスを合わせる軽やかなパスタです。",
+        crossSell: [
+          { icon: "🍆", name: "泉州水ナス", location: "地場野菜コーナー" },
+          { icon: "🍝", name: "パスタ麺", location: "乾物コーナー" },
+          { icon: "🌿", name: "フレッシュバジル", location: "野菜売り場" }
+        ],
+        time: "約12分",
+        steps: "1. パスタを茹でる。<br>2. ボウルで角切りトマト、一口大に手で裂いた水ナス、オリーブオイルを和える。<br>3. 茹で上がったパスタとバジルを加えて絡めて完成！"
+      },
+      hot: {
+        title: "北海道産トマトと大阪・毛馬きゅうりのひんやり冷製パスタ",
+        tag: "☀️ 暑い日にひんやりサッパリ",
+        image: "tomato-hot.png",
+        message: "暑い日でもツルッと食べられる！しっかり冷やした北海道トマトと、大阪伝統のシャキシャキ毛馬きゅうりで元気チャージ！",
+        crossSell: [
+          { icon: "🥒", name: "毛馬きゅうり（またはキュウリ）", location: "野菜売り場" },
+          { icon: "🐟", name: "ツナ缶", location: "缶詰コーナー" },
+          { icon: "🌱", name: "大葉", location: "野菜売り場" }
+        ],
+        time: "約10分",
+        steps: "1. トマトときゅうりを細かく切り冷やす。<br>2. 茹でて冷水で締めた麺、ツナと和える。<br>3. 大葉を添えて完成！"
+      }
     },
     grape: {
-      cold: [
-        {
-          title: "岡山産ブドウと大阪泉州タマネギのゴルゴンゾーラグラタン",
-          tag: "🍇 岡山×大阪！あつあつコラボ",
-          image: "grape-cold.png",
-          message: "寒さが増す夜にはコレ！じっくり炒めた泉州タマネギの甘みと熱々のチーズに、岡山産ブドウのジューシーな甘みが引き立つ贅沢グラタンです。",
-          crossSell: [
-            { icon: "🧀", name: "ゴルゴンゾーラチーズ", location: "乳製品コーナー" },
-            { icon: "🧅", name: "泉州タマネギ", location: "野菜売り場" },
-            { icon: "🥖", name: "バゲット", location: "ベーカリー" }
-          ],
-          time: "約20分",
-          steps: "1. 泉州タマネギを薄切りにし、飴色になるまで炒める。<br>2. 耐熱容器に炒めたタマネギ、ブドウ、チーズを乗せる。<br>3. トースターでチーズに焦げ目がつくまで約10分焼く。"
-        }
-      ],
-      cool: [
-        {
-          title: "岡山産ブドウと大阪・河内赤ワインの芳醇コンポート",
-          tag: "🍇 晴れの国×なにわの銘酒",
-          image: "grape-cool.png",
-          message: "少し肌寒い秋の夜長に。大阪特産の河内ワインで岡山産ブドウをサッと煮込んだ、身体が温まる大人の贅沢スイーツです。",
-          crossSell: [
-            { icon: "🍷", name: "河内ワイン (赤)", location: "お酒売り場" },
-            { icon: "🍨", name: "バニラアイス", location: "冷凍食品コーナー" }
-          ],
-          time: "約15分",
-          steps: "1. 鍋に河内ワイン、砂糖、シナモン、ブドウを入れて弱火にかける。<br>2. 5分ほど煮詰めたら火を止める。<br>3. 温かいままバニラアイスを添えて盛り付ける。"
-        }
-      ],
-      warm: [
-        {
-          title: "岡山シャインマスカットと大阪泉州水ナスの生ハムカプレーゼ",
-          tag: "🍇 岡山産マスカット×泉州水ナス",
-          image: "grape-warm.png",
-          message: "心地よい陽気におすすめ！岡山産シャインマスカットの弾ける甘みと、生で美味しい泉州水ナスの生食感がベストマッチ。",
-          crossSell: [
-            { icon: "🍆", name: "泉州水ナス", location: "地場野菜コーナー" },
-            { icon: "🧀", name: "モッツァレラチーズ", location: "乳製品コーナー" },
-            { icon: "🥓", name: "生ハム", location: "加工肉コーナー" }
-          ],
-          time: "約8分",
-          steps: "1. 泉州水ナスを手で一口大に裂き、マスカットは半分に切る。<br>2. チーズと生ハムと一緒に盛り付ける。<br>3. オリーブオイルと黒コショウを回しかける。"
-        }
-      ],
-      hot: [
-        {
-          title: "岡山産ブドウと大阪・河内白ワインのひんやりジュレパフェ",
-          tag: "🍇 ひんやり極上スイーツ",
-          image: "grape-hot.png",
-          message: "大阪の暑い日には冷たいご褒美！冷えた河内白ワインの爽やかなクラッシュゼリーと岡山産ブドウがベストマッチ。",
-          crossSell: [
-            { icon: "🍷", name: "河内ワイン (白)", location: "お酒売り場" },
-            { icon: "🥛", name: "プレーンヨーグルト", location: "乳製品コーナー" }
-          ],
-          time: "約10分 (冷やし時間除く)",
-          steps: "1. 河内白ワインとゼラチンでゆるめのゼリーを作る。<br>2. グラスにヨーグルト、固まったワインゼリーを崩して重ねる。<br>3. 冷やしたブドウをたっぷり乗せて完成！"
-        }
-      ]
+      cold: {
+        title: "岡山産ブドウと大阪泉州タマネギのゴルゴンゾーラグラタン",
+        tag: "❄️ 寒さに負けないあつあつコラボ",
+        image: "grape-cold.png",
+        message: "寒さが増す夜にはコレ！じっくり炒めた泉州タマネギの甘みと熱々のチーズに、岡山産ブドウのジューシーな甘みが引き立つ贅沢グラタンです。",
+        crossSell: [
+          { icon: "🧀", name: "ゴルゴンゾーラチーズ", location: "乳製品コーナー" },
+          { icon: "🧅", name: "泉州タマネギ", location: "野菜売り場" },
+          { icon: "🥖", name: "バゲット", location: "ベーカリー" }
+        ],
+        time: "約20分",
+        steps: "1. 泉州タマネギを薄切りにし、飴色になるまで炒める。<br>2. 耐熱容器に炒めたタマネギ、ブドウ、チーズを乗せる。<br>3. トースターでチーズに焦げ目がつくまで約10分焼く。"
+      },
+      cool: {
+        title: "岡山産ブドウと大阪・河内赤ワインの芳醇コンポート",
+        tag: "🍂 秋の夜長に温まる大人スイーツ",
+        image: "grape-cool.png",
+        message: "少し肌寒い秋の夜長に。大阪特産の河内ワインで岡山産ブドウをサッと煮込んだ、身体が温まる大人の贅沢スイーツです。",
+        crossSell: [
+          { icon: "🍷", name: "河内ワイン (赤)", location: "お酒売り場" },
+          { icon: "🍨", name: "バニラアイス", location: "冷凍食品コーナー" }
+        ],
+        time: "約15分",
+        steps: "1. 鍋に河内ワイン、砂糖、シナモン、ブドウを入れて弱火にかける。<br>2. 5分ほど煮詰めたら火を止める。<br>3. 温かいままバニラアイスを添えて盛り付ける。"
+      },
+      warm: {
+        title: "岡山シャインマスカットと大阪泉州水ナスの生ハムカプレーゼ",
+        tag: "🌤️ 爽やかな陽気にピッタリ",
+        image: "grape-warm.png",
+        message: "心地よい陽気におすすめ！岡山産シャインマスカットの弾ける甘みと、生で美味しい泉州水ナスの生食感がベストマッチ。",
+        crossSell: [
+          { icon: "🍆", name: "泉州水ナス", location: "地場野菜コーナー" },
+          { icon: "🧀", name: "モッツァレラチーズ", location: "乳製品コーナー" },
+          { icon: "🥓", name: "生ハム", location: "加工肉コーナー" }
+        ],
+        time: "約8分",
+        steps: "1. 泉州水ナスを手で一口大に裂き、マスカットは半分に切る。<br>2. チーズと生ハムと一緒に盛り付ける。<br>3. オリーブオイルと黒コショウを回しかける。"
+      },
+      hot: {
+        title: "岡山産ブドウと大阪・河内白ワインのひんやりジュレパフェ",
+        tag: "☀️ 暑い日にひんやり極上スイーツ",
+        image: "grape-hot.png",
+        message: "大阪の暑い日には冷たいご褒美！冷えた河内白ワインの爽やかなクラッシュゼリーと岡山産ブドウがベストマッチ。",
+        crossSell: [
+          { icon: "🍷", name: "河内ワイン (白)", location: "お酒売り場" },
+          { icon: "🥛", name: "プレーンヨーグルト", location: "乳製品コーナー" }
+        ],
+        time: "約10分 (冷やし時間除く)",
+        steps: "1. 河内白ワインとゼラチンでゆるめのゼリーを作る。<br>2. グラスにヨーグルト、固まったワインゼリーを崩して重ねる。<br>3. 冷やしたブドウをたっぷり乗せて完成！"
+      }
     }
   };
 
+  // 画面に特定レシピを表示する処理
+  function renderRecipe(recipe, temp) {
+    document.getElementById('weather-tag').innerText = recipe.tag;
+    mainImgEl.src = recipe.image;
+    document.getElementById('recipe-title').innerHTML = recipe.title;
+
+    if (temp !== undefined) {
+      document.getElementById('weather-message').innerText = `【現在の気温: ${temp}℃】${recipe.message}`;
+    } else {
+      document.getElementById('weather-message').innerText = recipe.message;
+    }
+
+    const itemListHtml = recipe.crossSell.map(item => `
+      <li>
+        <span class="item-icon">${item.icon}</span>
+        <span class="item-name">${item.name}</span>
+        <span class="item-location">${item.location}</span>
+      </li>
+    `).join('');
+    document.querySelector('.item-list').innerHTML = itemListHtml;
+
+    document.querySelector('.recipe-details').innerHTML = `
+      <h3>🍳 調理時間：${recipe.time}</h3>
+      <p style="font-size: 0.85rem; color: #666; line-height: 1.6;">
+        ${recipe.steps}
+      </p>
+    `;
+  }
+
+  // 位置情報取得メイン処理
   function getWeather() {
     const badge = document.getElementById('status-badge');
-    const weatherTag = document.getElementById('weather-tag');
-    const weatherMsg = document.getElementById('weather-message');
 
     if (!navigator.geolocation) {
       badge.innerText = "⚠️ GPS非対応のブラウザです";
@@ -376,9 +415,7 @@
           const response = await fetch(url);
           const data = await response.json();
 
-          if (data.cod !== 200) {
-            throw new Error(data.message);
-          }
+          if (data.cod !== 200) throw new Error(data.message);
 
           const cityName = data.name;
           const temp = Math.round(data.main.temp);
@@ -388,36 +425,41 @@
           badge.style.backgroundColor = "#8ac926";
           badge.style.color = "#fff";
 
-          let category = "cool";
-          if (temp < 10) category = "cold";
-          else if (temp >= 10 && temp < 20) category = "cool";
-          else if (temp >= 20 && temp < 30) category = "warm";
-          else if (temp >= 30) category = "hot";
+          let activeCat = "cool";
+          if (temp < 10) activeCat = "cold";
+          else if (temp >= 10 && temp < 20) activeCat = "cool";
+          else if (temp >= 20 && temp < 30) activeCat = "warm";
+          else if (temp >= 30) activeCat = "hot";
 
-          const targetItemData = recipeDatabase[currentItem] || recipeDatabase['tomato'];
-          const recipes = targetItemData[category] || targetItemData['cool'];
-          const selectedRecipe = recipes[Math.floor(Math.random() * recipes.length)];
+          const categoryList = recipeDatabase[currentItem] || recipeDatabase['tomato'];
 
-          weatherTag.innerText = selectedRecipe.tag;
-          mainImgEl.src = selectedRecipe.image;
-          document.getElementById('recipe-title').innerHTML = selectedRecipe.title;
-          weatherMsg.innerText = `【大阪の現在の気温: ${temp}℃】${selectedRecipe.message}`;
+          // 1. 気温にピッタリのおすすめ（主レシピ）を表示
+          renderRecipe(categoryList[activeCat], temp);
 
-          const itemListHtml = selectedRecipe.crossSell.map(item => `
-            <li>
-              <span class="item-icon">${item.icon}</span>
-              <span class="item-name">${item.name}</span>
-              <span class="item-location">${item.location}</span>
-            </li>
-          `).join('');
-          document.querySelector('.item-list').innerHTML = itemListHtml;
+          // 2. 他3つのレシピ選択ボタンを生成して表示
+          const otherContainer = document.getElementById('other-recipe-buttons');
+          otherContainer.innerHTML = "";
 
-          document.querySelector('.recipe-details').innerHTML = `
-            <h3>🍳 調理時間：${selectedRecipe.time}</h3>
-            <p style="font-size: 0.85rem; color: #666; line-height: 1.6;">
-              ${selectedRecipe.steps}
-            </p>
-          `;
+          const catKeys = ["cold", "cool", "warm", "hot"];
+          catKeys.forEach(cat => {
+            const recipeObj = categoryList[cat];
+            const btn = document.createElement('button');
+            btn.className = `other-recipe-btn ${cat === activeCat ? 'active' : ''}`;
+            
+            // 現在推奨のレシピには★をつける
+            btn.innerHTML = `${cat === activeCat ? '★[本日のおすすめ] ' : ''}${recipeObj.title}`;
+            
+            // クリック時にレシピを動的切替
+            btn.onclick = () => {
+              document.querySelectorAll('.other-recipe-btn').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              renderRecipe(recipeObj, temp);
+            };
+
+            otherContainer.appendChild(btn);
+          });
+
+          document.getElementById('other-recipes-section').style.display = "block";
 
         } catch (error) {
           console.error(error);
