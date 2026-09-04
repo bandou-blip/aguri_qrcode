@@ -179,7 +179,7 @@
 
   <div class="recipe-image-container">
     <span class="weather-tag" id="weather-tag">❓ 天気を取得してください</span>
-    <img id="main-image" src="" alt="料理画像">
+    <img id="main-image" src="" alt="料理画像" onerror="handleImageError(this)">
   </div>
 
   <h1 id="recipe-title">本日のフレッシュ食材で作る！<br>おすすめレシピ</h1>
@@ -218,16 +218,25 @@
   const urlParams = new URLSearchParams(window.location.search);
   const currentItem = urlParams.get('item') || 'tomato';
 
-  // 📸 直リンクブロックを受けない安定した高画質写真URL
-  const TOMATO_SOUP_IMG = "https://images.pexels.com/photos/539451/pexels-photo-539451.jpeg?auto=compress&cs=tinysrgb&w=800";
-  const TOMATO_STEW_IMG = "https://images.pexels.com/photos/1327838/pexels-photo-1327838.jpeg?auto=compress&cs=tinysrgb&w=800";
-  const TOMATO_PASTA_IMG = "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800";
-  const TOMATO_COLD_IMG = "https://images.pexels.com/photos/1256875/pexels-photo-1256875.jpeg?auto=compress&cs=tinysrgb&w=800";
+  // 🛡️ 画像読み込み失敗時のバックアップ用SVG（100%表示保障）
+  const FALLBACK_TOMATO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'><rect width='800' height='400' fill='%23ff6b6b'/><circle cx='400' cy='200' r='100' fill='%23ee5253'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='42' font-weight='bold'>🍅 FRESH TOMATO</text></svg>";
+  const FALLBACK_GRAPE = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'><rect width='800' height='400' fill='%236c5ce7'/><circle cx='400' cy='200' r='100' fill='%23a29bfe'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='42' font-weight='bold'>🍇 OKAYAMA GRAPE</text></svg>";
 
-  const GRAPE_PIE_IMG = "https://images.pexels.com/photos/2693447/pexels-photo-2693447.jpeg?auto=compress&cs=tinysrgb&w=800";
-  const GRAPE_SALAD_IMG = "https://images.pexels.com/photos/2097090/pexels-photo-2097090.jpeg?auto=compress&cs=tinysrgb&w=800";
-  const GRAPE_CHEESE_IMG = "https://images.pexels.com/photos/708777/pexels-photo-708777.jpeg?auto=compress&cs=tinysrgb&w=800";
-  const GRAPE_PASTA_IMG = "https://images.pexels.com/photos/1256875/pexels-photo-1256875.jpeg?auto=compress&cs=tinysrgb&w=800";
+  function handleImageError(img) {
+    img.onerror = null; // 無限ループ防止
+    img.src = (currentItem === 'grape') ? FALLBACK_GRAPE : FALLBACK_TOMATO;
+  }
+
+  // 📸 写真URL設定
+  const TOMATO_SOUP_IMG = "https://picsum.photos/id/1080/800/500";
+  const TOMATO_STEW_IMG = "https://picsum.photos/id/1025/800/500";
+  const TOMATO_PASTA_IMG = "https://picsum.photos/id/488/800/500";
+  const TOMATO_COLD_IMG = "https://picsum.photos/id/292/800/500";
+
+  const GRAPE_PIE_IMG = "https://picsum.photos/id/312/800/500";
+  const GRAPE_SALAD_IMG = "https://picsum.photos/id/625/800/500";
+  const GRAPE_CHEESE_IMG = "https://picsum.photos/id/824/800/500";
+  const GRAPE_PASTA_IMG = "https://picsum.photos/id/1060/800/500";
 
   // 初期画面設定
   const mainImgEl = document.getElementById('main-image');
