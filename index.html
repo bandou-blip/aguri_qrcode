@@ -48,10 +48,14 @@
     .recipe-image-container {
       position: relative;
       width: 100%;
-      height: 220px;
+      height: 200px;
       border-radius: 16px;
       overflow: hidden;
       margin-bottom: 16px;
+      background-color: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .recipe-image-container img {
@@ -71,6 +75,7 @@
       font-weight: bold;
       font-size: 0.85rem;
       color: #333;
+      z-index: 10;
     }
 
     h1 {
@@ -177,7 +182,7 @@
 
   <div class="recipe-image-container">
     <span class="weather-tag" id="weather-tag">❓ 天気を取得してください</span>
-    <img id="main-image" src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80" alt="料理画像">
+    <img id="main-image" src="" alt="料理画像">
   </div>
 
   <h1 id="recipe-title">本日のフレッシュ食材で作る！<br>おすすめレシピ</h1>
@@ -216,24 +221,28 @@
   const urlParams = new URLSearchParams(window.location.search);
   const currentItem = urlParams.get('item') || 'tomato';
 
-  // 🍇 確実にブドウが表示される画像URLに更新済み
-  const GRAPE_IMG = "https://images.unsplash.com/photo-1596368708386-5d0fba39514f?auto=format&fit=crop&w=800&q=80";
-  const TOMATO_IMG = "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80";
+  // 100%外部通信なしで表示されるSVGイラストデータ（データURL）
+  const TOMATO_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'><rect width='800' height='400' fill='%23ff6b6b'/><circle cx='400' cy='220' r='120' fill='%23ee5253'/><path d='M370 110 Q400 80 430 110 Q400 130 370 110 Z' fill='%2310ac84'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='48' font-weight='bold' font-family='sans-serif'>🍅 FRESH TOMATO</text></svg>";
+  
+  const GRAPE_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'><rect width='800' height='400' fill='%236c5ce7'/><circle cx='360' cy='180' r='40' fill='%23a29bfe'/><circle cx='440' cy='180' r='40' fill='%23a29bfe'/><circle cx='400' cy='240' r='40' fill='%23a29bfe'/><text x='50%' y='80%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='42' font-weight='bold' font-family='sans-serif'>🍇 OKAYAMA GRAPE</text></svg>";
 
-  // 初期画像の自動設定（読み込み直後）
+  // 初期画面の切り替え
+  const mainImgEl = document.getElementById('main-image');
   if (currentItem === 'grape') {
-    document.getElementById('main-image').src = GRAPE_IMG;
+    mainImgEl.src = GRAPE_SVG;
     document.getElementById('recipe-title').innerHTML = "岡山産ブドウで作る！<br>おすすめレシピ";
+  } else {
+    mainImgEl.src = TOMATO_SVG;
   }
 
-  // 食材ごとのマルチレシピデータベース
+  // レシピデータベース
   const recipeDatabase = {
     tomato: {
       cold: [
         {
           title: "丸ごとトマトと挽き肉の濃厚アツアツスープ",
           tag: "❄️ 寒さに負けない熱々スープ",
-          image: TOMATO_IMG,
+          image: TOMATO_SVG,
           message: "大阪の街も冷え込む今日はお鍋感覚で温まりましょう！トマトの酸味と挽き肉の旨味が溶け込んだスープです。",
           crossSell: [
             { icon: "🥩", name: "合挽き肉 (200g)", location: "精肉コーナー" },
@@ -248,7 +257,7 @@
         {
           title: "じっくり旨味を引き出す トマトと鶏肉の煮込み",
           tag: "🍂 肌寒い日に嬉しいほっこり煮込み",
-          image: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=800&q=80",
+          image: TOMATO_SVG,
           message: "少し肌寒い大阪の夕方。ジューシーな鶏肉とトマトの旨味がベストマッチなメインディッシュです。",
           crossSell: [
             { icon: "🍗", name: "鶏もも肉 (300g)", location: "精肉コーナー" },
@@ -262,7 +271,7 @@
         {
           title: "フレッシュトマトとツナのバジルパスタ",
           tag: "🌤️ 爽やかな陽気にピッタリ！",
-          image: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80",
+          image: TOMATO_SVG,
           message: "暖かくなってきた今日にぴったり！加熱しすぎずフレッシュなトマトを楽しむ軽やかなパスタです。",
           crossSell: [
             { icon: "🐟", name: "ツナ缶 (1缶)", location: "缶詰コーナー" },
@@ -276,7 +285,7 @@
         {
           title: "火を使わない！冷製和風パスタ",
           tag: "☀️ 暑い日に！ひんやりサッパリ",
-          image: "https://images.unsplash.com/photo-1595295333158-4742f28fbd85?auto=format&fit=crop&w=800&q=80",
+          image: TOMATO_SVG,
           message: "暑い日はキッチンの火を使いたくない！冷やしたトマトで爽やかに味わいましょう。",
           crossSell: [
             { icon: "🌱", name: "大葉 (1パック)", location: "野菜売り場" },
@@ -292,7 +301,7 @@
         {
           title: "岡山産ブドウとカマンベールのホットパイ",
           tag: "🍇 岡山直送！とろける甘み",
-          image: GRAPE_IMG,
+          image: GRAPE_SVG,
           message: "寒くなってきた大阪の夜に、岡山から届いた果汁たっぷりのブドウを温かいスウィーツで贅沢に楽しみませんか？",
           crossSell: [
             { icon: "🧀", name: "カマンベールチーズ", location: "乳製品コーナー" },
@@ -307,7 +316,7 @@
         {
           title: "岡山産ブドウと生ハムの贅沢バル風サラダ",
           tag: "🍇 晴れの国・岡山の恵み",
-          image: GRAPE_IMG,
+          image: GRAPE_SVG,
           message: "肌寒い日は、おうちでワインと楽しむおしゃれバル気分！岡山産の弾ける甘さと生ハムの塩気が相性抜群です。",
           crossSell: [
             { icon: "🥓", name: "生ハム", location: "加工肉コーナー" },
@@ -322,7 +331,7 @@
         {
           title: "岡山産ブドウとマスカルポーネの冷製パフェ",
           tag: "🍇 岡山産ブドウのご褒美デザート",
-          image: GRAPE_IMG,
+          image: GRAPE_SVG,
           message: "心地よい気候の今日は、岡山が誇る絶品ブドウを使ったフレッシュなカフェ風デザート！",
           crossSell: [
             { icon: "🍨", name: "マスカルポーネ", location: "乳製品コーナー" },
@@ -336,7 +345,7 @@
         {
           title: "岡山産ブドウと生ハムの冷製カッペリーニ",
           tag: "🍇 ひんやり爽やかフルーツパスタ",
-          image: GRAPE_IMG,
+          image: GRAPE_SVG,
           message: "大阪の暑い日にはコレ！岡山のジューシーなブドウの甘みとレモンの酸味でサッパリ味わう贅沢ランチです。",
           crossSell: [
             { icon: "🍝", name: "カッペリーニ", location: "乾物コーナー" },
@@ -395,7 +404,7 @@
           const selectedRecipe = recipes[Math.floor(Math.random() * recipes.length)];
 
           weatherTag.innerText = selectedRecipe.tag;
-          document.getElementById('main-image').src = selectedRecipe.image;
+          mainImgEl.src = selectedRecipe.image;
           document.getElementById('recipe-title').innerHTML = selectedRecipe.title;
           weatherMsg.innerText = `【大阪の現在の気温: ${temp}℃】${selectedRecipe.message}`;
 
