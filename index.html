@@ -48,14 +48,11 @@
     .recipe-image-container {
       position: relative;
       width: 100%;
-      height: 200px;
+      height: 220px;
       border-radius: 16px;
       overflow: hidden;
       margin-bottom: 16px;
       background-color: #f8f9fa;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .recipe-image-container img {
@@ -221,18 +218,17 @@
   const urlParams = new URLSearchParams(window.location.search);
   const currentItem = urlParams.get('item') || 'tomato';
 
-  // 100%外部通信なしで表示されるSVGイラストデータ（データURL）
-  const TOMATO_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'><rect width='800' height='400' fill='%23ff6b6b'/><circle cx='400' cy='220' r='120' fill='%23ee5253'/><path d='M370 110 Q400 80 430 110 Q400 130 370 110 Z' fill='%2310ac84'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='48' font-weight='bold' font-family='sans-serif'>🍅 FRESH TOMATO</text></svg>";
-  
-  const GRAPE_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'><rect width='800' height='400' fill='%236c5ce7'/><circle cx='360' cy='180' r='40' fill='%23a29bfe'/><circle cx='440' cy='180' r='40' fill='%23a29bfe'/><circle cx='400' cy='240' r='40' fill='%23a29bfe'/><text x='50%' y='80%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='42' font-weight='bold' font-family='sans-serif'>🍇 OKAYAMA GRAPE</text></svg>";
+  // 📸 高画質な料理写真の直リンクURL
+  const GRAPE_IMG = "https://images.pexels.com/photos/708777/pexels-photo-708777.jpeg?auto=compress&cs=tinysrgb&w=800";
+  const TOMATO_IMG = "https://images.pexels.com/photos/1327838/pexels-photo-1327838.jpeg?auto=compress&cs=tinysrgb&w=800";
 
-  // 初期画面の切り替え
+  // 初期画面の設定
   const mainImgEl = document.getElementById('main-image');
   if (currentItem === 'grape') {
-    mainImgEl.src = GRAPE_SVG;
+    mainImgEl.src = GRAPE_IMG;
     document.getElementById('recipe-title').innerHTML = "岡山産ブドウで作る！<br>おすすめレシピ";
   } else {
-    mainImgEl.src = TOMATO_SVG;
+    mainImgEl.src = TOMATO_IMG;
   }
 
   // レシピデータベース
@@ -242,7 +238,7 @@
         {
           title: "丸ごとトマトと挽き肉の濃厚アツアツスープ",
           tag: "❄️ 寒さに負けない熱々スープ",
-          image: TOMATO_SVG,
+          image: TOMATO_IMG,
           message: "大阪の街も冷え込む今日はお鍋感覚で温まりましょう！トマトの酸味と挽き肉の旨味が溶け込んだスープです。",
           crossSell: [
             { icon: "🥩", name: "合挽き肉 (200g)", location: "精肉コーナー" },
@@ -257,7 +253,7 @@
         {
           title: "じっくり旨味を引き出す トマトと鶏肉の煮込み",
           tag: "🍂 肌寒い日に嬉しいほっこり煮込み",
-          image: TOMATO_SVG,
+          image: TOMATO_IMG,
           message: "少し肌寒い大阪の夕方。ジューシーな鶏肉とトマトの旨味がベストマッチなメインディッシュです。",
           crossSell: [
             { icon: "🍗", name: "鶏もも肉 (300g)", location: "精肉コーナー" },
@@ -271,7 +267,7 @@
         {
           title: "フレッシュトマトとツナのバジルパスタ",
           tag: "🌤️ 爽やかな陽気にピッタリ！",
-          image: TOMATO_SVG,
+          image: TOMATO_IMG,
           message: "暖かくなってきた今日にぴったり！加熱しすぎずフレッシュなトマトを楽しむ軽やかなパスタです。",
           crossSell: [
             { icon: "🐟", name: "ツナ缶 (1缶)", location: "缶詰コーナー" },
@@ -285,7 +281,7 @@
         {
           title: "火を使わない！冷製和風パスタ",
           tag: "☀️ 暑い日に！ひんやりサッパリ",
-          image: TOMATO_SVG,
+          image: TOMATO_IMG,
           message: "暑い日はキッチンの火を使いたくない！冷やしたトマトで爽やかに味わいましょう。",
           crossSell: [
             { icon: "🌱", name: "大葉 (1パック)", location: "野菜売り場" },
@@ -301,7 +297,7 @@
         {
           title: "岡山産ブドウとカマンベールのホットパイ",
           tag: "🍇 岡山直送！とろける甘み",
-          image: GRAPE_SVG,
+          image: GRAPE_IMG,
           message: "寒くなってきた大阪の夜に、岡山から届いた果汁たっぷりのブドウを温かいスウィーツで贅沢に楽しみませんか？",
           crossSell: [
             { icon: "🧀", name: "カマンベールチーズ", location: "乳製品コーナー" },
@@ -316,7 +312,7 @@
         {
           title: "岡山産ブドウと生ハムの贅沢バル風サラダ",
           tag: "🍇 晴れの国・岡山の恵み",
-          image: GRAPE_SVG,
+          image: GRAPE_IMG,
           message: "肌寒い日は、おうちでワインと楽しむおしゃれバル気分！岡山産の弾ける甘さと生ハムの塩気が相性抜群です。",
           crossSell: [
             { icon: "🥓", name: "生ハム", location: "加工肉コーナー" },
@@ -331,7 +327,7 @@
         {
           title: "岡山産ブドウとマスカルポーネの冷製パフェ",
           tag: "🍇 岡山産ブドウのご褒美デザート",
-          image: GRAPE_SVG,
+          image: GRAPE_IMG,
           message: "心地よい気候の今日は、岡山が誇る絶品ブドウを使ったフレッシュなカフェ風デザート！",
           crossSell: [
             { icon: "🍨", name: "マスカルポーネ", location: "乳製品コーナー" },
@@ -345,7 +341,7 @@
         {
           title: "岡山産ブドウと生ハムの冷製カッペリーニ",
           tag: "🍇 ひんやり爽やかフルーツパスタ",
-          image: GRAPE_SVG,
+          image: GRAPE_IMG,
           message: "大阪の暑い日にはコレ！岡山のジューシーなブドウの甘みとレモンの酸味でサッパリ味わう贅沢ランチです。",
           crossSell: [
             { icon: "🍝", name: "カッペリーニ", location: "乾物コーナー" },
