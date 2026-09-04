@@ -214,31 +214,31 @@
 <script>
   const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
 
-  // URLパラメータの取得
+  // URLパラメータの取得 (?item=grape 等)
   const urlParams = new URLSearchParams(window.location.search);
   const currentItem = urlParams.get('item') || 'tomato';
 
-  // 📸 高画質な料理写真の直リンクURL
-  const GRAPE_IMG = "https://images.pexels.com/photos/708777/pexels-photo-708777.jpeg?auto=compress&cs=tinysrgb&w=800";
-  const TOMATO_IMG = "https://images.pexels.com/photos/1327838/pexels-photo-1327838.jpeg?auto=compress&cs=tinysrgb&w=800";
+  // 📸 初期表示用画像
+  const INIT_TOMATO_IMG = "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80";
+  const INIT_GRAPE_IMG = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80";
 
-  // 初期画面の設定
+  // 初期画面設定
   const mainImgEl = document.getElementById('main-image');
   if (currentItem === 'grape') {
-    mainImgEl.src = GRAPE_IMG;
+    mainImgEl.src = INIT_GRAPE_IMG;
     document.getElementById('recipe-title').innerHTML = "岡山産ブドウで作る！<br>おすすめレシピ";
   } else {
-    mainImgEl.src = TOMATO_IMG;
+    mainImgEl.src = INIT_TOMATO_IMG;
   }
 
-  // レシピデータベース
+  // 🍳 各レシピに最適化した料理写真付きデータベース
   const recipeDatabase = {
     tomato: {
       cold: [
         {
           title: "丸ごとトマトと挽き肉の濃厚アツアツスープ",
           tag: "❄️ 寒さに負けない熱々スープ",
-          image: TOMATO_IMG,
+          image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80",
           message: "大阪の街も冷え込む今日はお鍋感覚で温まりましょう！トマトの酸味と挽き肉の旨味が溶け込んだスープです。",
           crossSell: [
             { icon: "🥩", name: "合挽き肉 (200g)", location: "精肉コーナー" },
@@ -253,7 +253,7 @@
         {
           title: "じっくり旨味を引き出す トマトと鶏肉の煮込み",
           tag: "🍂 肌寒い日に嬉しいほっこり煮込み",
-          image: TOMATO_IMG,
+          image: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=800&q=80",
           message: "少し肌寒い大阪の夕方。ジューシーな鶏肉とトマトの旨味がベストマッチなメインディッシュです。",
           crossSell: [
             { icon: "🍗", name: "鶏もも肉 (300g)", location: "精肉コーナー" },
@@ -267,7 +267,7 @@
         {
           title: "フレッシュトマトとツナのバジルパスタ",
           tag: "🌤️ 爽やかな陽気にピッタリ！",
-          image: TOMATO_IMG,
+          image: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80",
           message: "暖かくなってきた今日にぴったり！加熱しすぎずフレッシュなトマトを楽しむ軽やかなパスタです。",
           crossSell: [
             { icon: "🐟", name: "ツナ缶 (1缶)", location: "缶詰コーナー" },
@@ -281,7 +281,7 @@
         {
           title: "火を使わない！冷製和風パスタ",
           tag: "☀️ 暑い日に！ひんやりサッパリ",
-          image: TOMATO_IMG,
+          image: "https://images.unsplash.com/photo-1595295333158-4742f28fbd85?auto=format&fit=crop&w=800&q=80",
           message: "暑い日はキッチンの火を使いたくない！冷やしたトマトで爽やかに味わいましょう。",
           crossSell: [
             { icon: "🌱", name: "大葉 (1パック)", location: "野菜売り場" },
@@ -297,7 +297,7 @@
         {
           title: "岡山産ブドウとカマンベールのホットパイ",
           tag: "🍇 岡山直送！とろける甘み",
-          image: GRAPE_IMG,
+          image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=800&q=80",
           message: "寒くなってきた大阪の夜に、岡山から届いた果汁たっぷりのブドウを温かいスウィーツで贅沢に楽しみませんか？",
           crossSell: [
             { icon: "🧀", name: "カマンベールチーズ", location: "乳製品コーナー" },
@@ -312,7 +312,7 @@
         {
           title: "岡山産ブドウと生ハムの贅沢バル風サラダ",
           tag: "🍇 晴れの国・岡山の恵み",
-          image: GRAPE_IMG,
+          image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
           message: "肌寒い日は、おうちでワインと楽しむおしゃれバル気分！岡山産の弾ける甘さと生ハムの塩気が相性抜群です。",
           crossSell: [
             { icon: "🥓", name: "生ハム", location: "加工肉コーナー" },
@@ -327,7 +327,7 @@
         {
           title: "岡山産ブドウとマスカルポーネの冷製パフェ",
           tag: "🍇 岡山産ブドウのご褒美デザート",
-          image: GRAPE_IMG,
+          image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80",
           message: "心地よい気候の今日は、岡山が誇る絶品ブドウを使ったフレッシュなカフェ風デザート！",
           crossSell: [
             { icon: "🍨", name: "マスカルポーネ", location: "乳製品コーナー" },
@@ -341,7 +341,7 @@
         {
           title: "岡山産ブドウと生ハムの冷製カッペリーニ",
           tag: "🍇 ひんやり爽やかフルーツパスタ",
-          image: GRAPE_IMG,
+          image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
           message: "大阪の暑い日にはコレ！岡山のジューシーなブドウの甘みとレモンの酸味でサッパリ味わう贅沢ランチです。",
           crossSell: [
             { icon: "🍝", name: "カッペリーニ", location: "乾物コーナー" },
