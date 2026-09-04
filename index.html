@@ -218,140 +218,136 @@
   const urlParams = new URLSearchParams(window.location.search);
   const currentItem = urlParams.get('item') || 'tomato';
 
-  // 📸 完全整合性・永続表示が保証された料理写真（Wikimedia/WikiData直リンク）
-  const IMG_TOMATO_SOUP = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Tomato_soup.jpg/800px-Tomato_soup.jpg";
-  const IMG_TOMATO_STEW = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Chicken_tomato_stew.jpg/800px-Chicken_tomato_stew.jpg";
-  const IMG_TOMATO_PASTA = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Spaghetti_alla_Carbonara_2.jpg/800px-Spaghetti_alla_Carbonara_2.jpg";
-
-  const IMG_GRAPE_SALAD = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Salad_platter_with_grapes.jpg/800px-Salad_platter_with_grapes.jpg";
-  const IMG_GRAPE_DESSERT = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Grape_dessert_glass.jpg/800px-Grape_dessert_glass.jpg";
-
   // 初期画面設定
   const mainImgEl = document.getElementById('main-image');
   if (currentItem === 'grape') {
-    mainImgEl.src = IMG_GRAPE_SALAD;
-    document.getElementById('recipe-title').innerHTML = "岡山産ブドウで作る！<br>おすすめレシピ";
+    mainImgEl.src = "grape-warm.png";
+    document.getElementById('recipe-title').innerHTML = "岡山産ブドウ×大阪特産！<br>コラボレシピ";
   } else {
-    mainImgEl.src = IMG_TOMATO_SOUP;
+    mainImgEl.src = "tomato-warm.png";
+    document.getElementById('recipe-title').innerHTML = "北海道産トマト×大阪特産！<br>コラボレシピ";
   }
 
-  // 🍳 厳選レシピデータベース（写真が完璧にマッチするもののみ残して整理）
+  // 🍳 レシピデータベース（すべて .png 対応）
   const recipeDatabase = {
     tomato: {
       cold: [
         {
-          title: "丸ごとトマトと挽き肉の濃厚アツアツスープ",
-          tag: "❄️ 寒さに負けない熱々スープ",
-          image: IMG_TOMATO_SOUP,
-          message: "大阪の街も冷え込む今日はお鍋感覚で温まりましょう！トマトの酸味と挽き肉の旨味が溶け込んだスープです。",
+          title: "北海道産トマトと大阪泉州タマネギの濃厚あつあつミネストローネ",
+          tag: "🍅 北海道×大阪！からだ温まるスープ",
+          image: "tomato-cold.png",
+          message: "大阪の街も冷え込む今日はお鍋感覚で温まりましょう！北海道産トマトの甘みと炒めた泉州タマネギのコクが溶け込んだスープです。",
           crossSell: [
+            { icon: "🧅", name: "泉州タマネギ", location: "地場野菜コーナー" },
             { icon: "🥩", name: "合挽き肉 (200g)", location: "精肉コーナー" },
-            { icon: "🧅", name: "玉ねぎ (1個)", location: "野菜売り場" },
             { icon: "🧂", name: "コンソメの素", location: "調味料コーナー" }
           ],
           time: "約15分",
-          steps: "1. 玉ねぎと挽き肉を炒める。<br>2. 水、コンソメ、くり抜いたトマトを投入。<br>3. 弱火で10分煮込めば完成！"
+          steps: "1. 泉州タマネギと挽き肉をしっかり炒める。<br>2. 水、コンソメ、角切りにした北海道トマトを加える。<br>3. 弱火で10分ほど煮込めば完成！"
         }
       ],
       cool: [
         {
-          title: "じっくり旨味を引き出す トマトと鶏肉の煮込み",
-          tag: "🍂 肌寒い日に嬉しいほっこり煮込み",
-          image: IMG_TOMATO_STEW,
-          message: "少し肌寒い大阪の夕方。ジューシーな鶏肉とトマトの旨味がベストマッチなメインディッシュです。",
+          title: "北海道産トマトと大阪産なにわ黒牛の煮込みハンバーグ",
+          tag: "🍅 ほっこり温まる贅沢ディナー",
+          image: "tomato-cool.png",
+          message: "少し肌寒い大阪の夕方。なにわ黒牛のジューシーな肉汁と、北海道産トマトの濃厚な旨味ソースが相性抜群です。",
           crossSell: [
-            { icon: "🍗", name: "鶏もも肉 (300g)", location: "精肉コーナー" },
+            { icon: "🥩", name: "なにわ黒牛挽き肉", location: "精肉コーナー" },
             { icon: "🧄", name: "にんにく", location: "野菜売り場" }
           ],
           time: "約25分",
-          steps: "1. 鶏肉に焼き目をつける。<br>2. 刻んだトマト、にんにくを加える。<br>3. 蓋をして15分弱火で煮込む。"
+          steps: "1. ハンバーグを作り両面に焼き目をつける。<br>2. 潰した北海道トマト、にんにく、調味料を加える。<br>3. 蓋をして15分弱火でじっくり煮込む。"
         }
       ],
       warm: [
         {
-          title: "フレッシュトマトとツナのバジルパスタ",
-          tag: "🌤️ 爽やかな陽気にピッタリ！",
-          image: IMG_TOMATO_PASTA,
-          message: "暖かくなってきた今日にぴったり！加熱しすぎずフレッシュなトマトを楽しむ軽やかなパスタです。",
+          title: "北海道産トマトと大阪泉州水ナスのフレッシュバジルパスタ",
+          tag: "🍅 陽気な日にピッタリのパスタ",
+          image: "tomato-warm.png",
+          message: "暖かくなってきた今日にぴったり！加熱しすぎずフレッシュな北海道トマトと生で甘い泉州水ナスを合わせる軽やかなパスタです。",
           crossSell: [
-            { icon: "🐟", name: "ツナ缶 (1缶)", location: "缶詰コーナー" },
-            { icon: "🍝", name: "パスタ麺", location: "乾物コーナー" }
+            { icon: "🍆", name: "泉州水ナス", location: "地場野菜コーナー" },
+            { icon: "🍝", name: "パスタ麺", location: "乾物コーナー" },
+            { icon: "🌿", name: "フレッシュバジル", location: "野菜売り場" }
           ],
           time: "約12分",
-          steps: "1. パスタを茹でる。<br>2. ボウルで角切りトマト、ツナ、オリーブオイルを和える。<br>3. 茹で上がったパスタと絡めて完成！"
+          steps: "1. パスタを茹でる。<br>2. ボウルで角切りトマト、一口大に手で裂いた水ナス、オリーブオイルを和える。<br>3. 茹で上がったパスタとバジルを加えて絡めて完成！"
         }
       ],
       hot: [
         {
-          title: "フレッシュトマトとツナのバジルパスタ",
-          tag: "☀️ 暑い日にさっぱり召し上がれ",
-          image: IMG_TOMATO_PASTA,
-          message: "暑い日でもツルッと食べられる！酸味の効いたトマトとパスタで元気をチャージしましょう。",
+          title: "北海道産トマトと大阪・毛馬きゅうりのひんやり冷製パスタ",
+          tag: "🍅 暑い日にひんやりサッパリ",
+          image: "tomato-hot.png",
+          message: "暑い日でもツルッと食べられる！しっかり冷やした北海道トマトと、大阪伝統のシャキシャキ毛馬きゅうりで元気チャージ！",
           crossSell: [
-            { icon: "🌱", name: "大葉 (1パック)", location: "野菜売り場" },
-            { icon: "🐟", name: "ツナ缶", location: "缶詰コーナー" }
+            { icon: "🥒", name: "毛馬きゅうり（またはキュウリ）", location: "野菜売り場" },
+            { icon: "🐟", name: "ツナ缶", location: "缶詰コーナー" },
+            { icon: "🌱", name: "大葉", location: "野菜売り場" }
           ],
           time: "約10分",
-          steps: "1. トマトをサイコロ状に切り冷やす。<br>2. 茹でて冷水で締めた麺と和える。<br>3. 大葉を添えて完成！"
+          steps: "1. トマトときゅうりを細かく切り冷やす。<br>2. 茹でて冷水で締めた麺、ツナと和える。<br>3. 大葉を添えて完成！"
         }
       ]
     },
     grape: {
       cold: [
         {
-          title: "岡山産ブドウと生ハムの贅沢バル風サラダ",
-          tag: "🍇 岡山直送！とろける甘み",
-          image: IMG_GRAPE_SALAD,
-          message: "寒くなってきた大阪の夜に、岡山から届いた果汁たっぷりのブドウを生ハムと合わせた贅沢サラダで楽しみませんか？",
+          title: "岡山産ブドウと大阪泉州タマネギのゴルゴンゾーラグラタン",
+          tag: "🍇 岡山×大阪！あつあつコラボ",
+          image: "grape-cold.png",
+          message: "寒さが増す夜にはコレ！じっくり炒めた泉州タマネギの甘みと熱々のチーズに、岡山産ブドウのジューシーな甘みが引き立つ贅沢グラタンです。",
           crossSell: [
-            { icon: "🥓", name: "生ハム", location: "加工肉コーナー" },
-            { icon: "🧀", name: "クリームチーズ", location: "乳製品コーナー" },
-            { icon: "🍷", name: "赤ワイン", location: "お酒売り場" }
+            { icon: "🧀", name: "ゴルゴンゾーラチーズ", location: "乳製品コーナー" },
+            { icon: "🧅", name: "泉州タマネギ", location: "野菜売り場" },
+            { icon: "🥖", name: "バゲット", location: "ベーカリー" }
           ],
-          time: "約10分",
-          steps: "1. ブドウを半分にカット。<br>2. リーフに生ハム、チーズ、ブドウを散らす。<br>3. オリーブオイルと黒コショウを振って完成！"
+          time: "約20分",
+          steps: "1. 泉州タマネギを薄切りにし、飴色になるまで炒める。<br>2. 耐熱容器に炒めたタマネギ、ブドウ、チーズを乗せる。<br>3. トースターでチーズに焦げ目がつくまで約10分焼く。"
         }
       ],
       cool: [
         {
-          title: "岡山産ブドウと生ハムの贅沢バル風サラダ",
-          tag: "🍇 晴れの国・岡山の恵み",
-          image: IMG_GRAPE_SALAD,
-          message: "肌寒い日は、おうちでワインと楽しむおしゃれバル気分！岡山産の弾ける甘さと生ハムの塩気が相性抜群です。",
+          title: "岡山産ブドウと大阪・河内赤ワインの芳醇コンポート",
+          tag: "🍇 晴れの国×なにわの銘酒",
+          image: "grape-cool.png",
+          message: "少し肌寒い秋の夜長に。大阪特産の河内ワインで岡山産ブドウをサッと煮込んだ、身体が温まる大人の贅沢スイーツです。",
           crossSell: [
-            { icon: "🥓", name: "生ハム", location: "加工肉コーナー" },
-            { icon: "🧀", name: "クリームチーズ", location: "乳製品コーナー" }
+            { icon: "🍷", name: "河内ワイン (赤)", location: "お酒売り場" },
+            { icon: "🍨", name: "バニラアイス", location: "冷凍食品コーナー" }
           ],
-          time: "約8分",
-          steps: "1. ブドウを半分にカット。<br>2. リーフに生ハム、チーズ、ブドウを散らす。<br>3. オリーブオイルを振って完成！"
+          time: "約15分",
+          steps: "1. 鍋に河内ワイン、砂糖、シナモン、ブドウを入れて弱火にかける。<br>2. 5分ほど煮詰めたら火を止める。<br>3. 温かいままバニラアイスを添えて盛り付ける。"
         }
       ],
       warm: [
         {
-          title: "岡山産ブドウとモッツァレラのサラダプレート",
-          tag: "🍇 爽やかな陽気にピッタリ！",
-          image: IMG_GRAPE_SALAD,
-          message: "ポカポカ暖かい陽気の日は、岡山産ブドウのみずみずしさを生かした絶品フレッシュおつまみで乾杯！",
+          title: "岡山シャインマスカットと大阪泉州水ナスの生ハムカプレーゼ",
+          tag: "🍇 岡山産マスカット×泉州水ナス",
+          image: "grape-warm.png",
+          message: "心地よい陽気におすすめ！岡山産シャインマスカットの弾ける甘みと、生で美味しい泉州水ナスの生食感がベストマッチ。",
           crossSell: [
+            { icon: "🍆", name: "泉州水ナス", location: "地場野菜コーナー" },
             { icon: "🧀", name: "モッツァレラチーズ", location: "乳製品コーナー" },
-            { icon: "🫒", name: "オリーブオイル", location: "調味料コーナー" }
+            { icon: "🥓", name: "生ハム", location: "加工肉コーナー" }
           ],
-          time: "約5分",
-          steps: "1. ブドウとチーズを一口大に切る。<br>2. お皿に盛り付け、オリーブオイルと塩コショウを回しかけて完成！"
+          time: "約8分",
+          steps: "1. 泉州水ナスを手で一口大に裂き、マスカットは半分に切る。<br>2. チーズと生ハムと一緒に盛り付ける。<br>3. オリーブオイルと黒コショウを回しかける。"
         }
       ],
       hot: [
         {
-          title: "ひんやり贅沢！岡山産ブドウのヨーグルトデザート",
-          tag: "🍇 ひんやり爽やかフルーツスイーツ",
-          image: IMG_GRAPE_DESSERT,
-          message: "大阪の暑い日にはコレ！岡山のジューシーなブドウをひんやりグラスデザートでさっぱり召し上がれ。",
+          title: "岡山産ブドウと大阪・河内白ワインのひんやりジュレパフェ",
+          tag: "🍇 ひんやり極上スイーツ",
+          image: "grape-hot.png",
+          message: "大阪の暑い日には冷たいご褒美！冷えた河内白ワインの爽やかなクラッシュゼリーと岡山産ブドウがベストマッチ。",
           crossSell: [
-            { icon: "🥛", name: "プレーンヨーグルト", location: "乳製品コーナー" },
-            { icon: "🍯", name: "はちみつ", location: "調味料コーナー" }
+            { icon: "🍷", name: "河内ワイン (白)", location: "お酒売り場" },
+            { icon: "🥛", name: "プレーンヨーグルト", location: "乳製品コーナー" }
           ],
-          time: "約3分",
-          steps: "1. グラスにヨーグルトを入れる。<br>2. 冷やしたブドウをたっぷり乗せる。<br>3. はちみつを回しかけて完成！"
+          time: "約10分 (冷やし時間除く)",
+          steps: "1. 河内白ワインとゼラチンでゆるめのゼリーを作る。<br>2. グラスにヨーグルト、固まったワインゼリーを崩して重ねる。<br>3. 冷やしたブドウをたっぷり乗せて完成！"
         }
       ]
     }
