@@ -177,10 +177,10 @@
 
   <div class="recipe-image-container">
     <span class="weather-tag" id="weather-tag">❓ 天気を取得してください</span>
-    <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80" alt="料理画像">
+    <img id="main-image" src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80" alt="料理画像">
   </div>
 
-  <h1>本日のフレッシュ食材で作る！<br>おすすめレシピ</h1>
+  <h1 id="recipe-title">本日のフレッシュ食材で作る！<br>おすすめレシピ</h1>
 
   <div class="ai-message" id="weather-message">
     下のボタンを押して、現在の天気に合わせたアドバイスを表示させましょう！
@@ -212,9 +212,19 @@
 <script>
   const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
 
-  // URLから ?item=xxx の値を取得（指定がなければ tomato）
+  // URLパラメータの取得
   const urlParams = new URLSearchParams(window.location.search);
   const currentItem = urlParams.get('item') || 'tomato';
+
+  // 🍇 確実にブドウが表示される画像URLに更新済み
+  const GRAPE_IMG = "https://images.unsplash.com/photo-1596368708386-5d0fba39514f?auto=format&fit=crop&w=800&q=80";
+  const TOMATO_IMG = "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80";
+
+  // 初期画像の自動設定（読み込み直後）
+  if (currentItem === 'grape') {
+    document.getElementById('main-image').src = GRAPE_IMG;
+    document.getElementById('recipe-title').innerHTML = "岡山産ブドウで作る！<br>おすすめレシピ";
+  }
 
   // 食材ごとのマルチレシピデータベース
   const recipeDatabase = {
@@ -223,7 +233,7 @@
         {
           title: "丸ごとトマトと挽き肉の濃厚アツアツスープ",
           tag: "❄️ 寒さに負けない熱々スープ",
-          image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80",
+          image: TOMATO_IMG,
           message: "大阪の街も冷え込む今日はお鍋感覚で温まりましょう！トマトの酸味と挽き肉の旨味が溶け込んだスープです。",
           crossSell: [
             { icon: "🥩", name: "合挽き肉 (200g)", location: "精肉コーナー" },
@@ -282,7 +292,7 @@
         {
           title: "岡山産ブドウとカマンベールのホットパイ",
           tag: "🍇 岡山直送！とろける甘み",
-          image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=800&q=80",
+          image: GRAPE_IMG,
           message: "寒くなってきた大阪の夜に、岡山から届いた果汁たっぷりのブドウを温かいスウィーツで贅沢に楽しみませんか？",
           crossSell: [
             { icon: "🧀", name: "カマンベールチーズ", location: "乳製品コーナー" },
@@ -297,7 +307,7 @@
         {
           title: "岡山産ブドウと生ハムの贅沢バル風サラダ",
           tag: "🍇 晴れの国・岡山の恵み",
-          image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
+          image: GRAPE_IMG,
           message: "肌寒い日は、おうちでワインと楽しむおしゃれバル気分！岡山産の弾ける甘さと生ハムの塩気が相性抜群です。",
           crossSell: [
             { icon: "🥓", name: "生ハム", location: "加工肉コーナー" },
@@ -312,7 +322,7 @@
         {
           title: "岡山産ブドウとマスカルポーネの冷製パフェ",
           tag: "🍇 岡山産ブドウのご褒美デザート",
-          image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80",
+          image: GRAPE_IMG,
           message: "心地よい気候の今日は、岡山が誇る絶品ブドウを使ったフレッシュなカフェ風デザート！",
           crossSell: [
             { icon: "🍨", name: "マスカルポーネ", location: "乳製品コーナー" },
@@ -326,7 +336,7 @@
         {
           title: "岡山産ブドウと生ハムの冷製カッペリーニ",
           tag: "🍇 ひんやり爽やかフルーツパスタ",
-          image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+          image: GRAPE_IMG,
           message: "大阪の暑い日にはコレ！岡山のジューシーなブドウの甘みとレモンの酸味でサッパリ味わう贅沢ランチです。",
           crossSell: [
             { icon: "🍝", name: "カッペリーニ", location: "乾物コーナー" },
@@ -385,8 +395,8 @@
           const selectedRecipe = recipes[Math.floor(Math.random() * recipes.length)];
 
           weatherTag.innerText = selectedRecipe.tag;
-          document.querySelector('.recipe-image-container img').src = selectedRecipe.image;
-          document.querySelector('h1').innerHTML = selectedRecipe.title;
+          document.getElementById('main-image').src = selectedRecipe.image;
+          document.getElementById('recipe-title').innerHTML = selectedRecipe.title;
           weatherMsg.innerText = `【大阪の現在の気温: ${temp}℃】${selectedRecipe.message}`;
 
           const itemListHtml = selectedRecipe.crossSell.map(item => `
