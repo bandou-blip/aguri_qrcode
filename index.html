@@ -220,7 +220,7 @@
 
   // 📸 初期表示用画像
   const INIT_TOMATO_IMG = "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80";
-  const INIT_GRAPE_IMG = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80";
+  const INIT_GRAPE_IMG = "https://images.unsplash.com/photo-1596368708386-5d0fba39514f?auto=format&fit=crop&w=800&q=80";
 
   // 初期画面設定
   const mainImgEl = document.getElementById('main-image');
@@ -231,7 +231,7 @@
     mainImgEl.src = INIT_TOMATO_IMG;
   }
 
-  // 🍳 レシピデータベース
+  // 🍳 安定した料理写真URLを持つレシピデータベース
   const recipeDatabase = {
     tomato: {
       cold: [
@@ -325,16 +325,17 @@
       ],
       warm: [
         {
-          title: "岡山産ブドウとマスカルポーネの冷製パフェ",
-          tag: "🍇 岡山産ブドウのご褒美デザート",
-          image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=80",
-          message: "心地よい気候の今日は、岡山が誇る絶品ブドウを使ったフレッシュなカフェ風デザート！",
+          title: "岡山産ブドウとモッツァレラのフレッシュカプレーゼ",
+          tag: "🍇 爽やかな陽気にピッタリ！",
+          image: "https://images.unsplash.com/photo-1592417817098-8f3d6eb12765?auto=format&fit=crop&w=800&q=80",
+          message: "ポカポカ暖かい陽気の日は、岡山産ブドウのみずみずしさを生かした絶品フレッシュおつまみで乾杯！",
           crossSell: [
-            { icon: "🍨", name: "マスカルポーネ", location: "乳製品コーナー" },
-            { icon: "🥣", name: "グラノーラ", location: "シリアル売り場" }
+            { icon: "🧀", name: "モッツァレラチーズ", location: "乳製品コーナー" },
+            { icon: "🫒", name: "エキストラバージンオイル", location: "調味料コーナー" },
+            { icon: "🌿", name: "生バジル", location: "野菜売り場" }
           ],
           time: "約5分",
-          steps: "1. グラスにグラノーラを敷く。<br>2. チーズとブドウを重ねる。<br>3. ミントを乗せて冷やして完成！"
+          steps: "1. ブドウを半分に、チーズを一口大に切る。<br>2. お皿に盛り付け、オリーブオイルと塩コショウを回しかける。<br>3. バジルを添えて完成！"
         }
       ],
       hot: [
