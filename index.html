@@ -1,14 +1,223 @@
-const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本日の天候おすすめレシピ</title>
+  <style>
+    :root {
+      --primary-color: #ff6b6b;
+      --accent-color: #ffd166;
+      --bg-color: #fff9f2;
+      --text-color: #4a4a4a;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .header-badge {
+      background: var(--accent-color);
+      color: #333;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      display: inline-block;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .recipe-image-container {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .recipe-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .weather-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(4px);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      color: var(--primary-color);
+      margin: 8px 0 12px;
+    }
+
+    .ai-message {
+      background: #fff5f5;
+      border-left: 4px solid var(--primary-color);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      text-align: left;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .cross-sell-section {
+      background: #f0f7ff;
+      border: 2px dashed #4ea8de;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .cross-sell-title {
+      font-weight: bold;
+      color: #0077b6;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .item-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .item-list li {
+      background: #ffffff;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .item-icon {
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .item-name {
+      flex: 1;
+      text-align: left;
+      margin-right: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .item-location {
+      font-size: 0.75rem;
+      background: #e2e8f0;
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: #4a5568;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .recipe-details {
+      text-align: left;
+      border-top: 1px solid #eee;
+      padding-top: 16px;
+    }
+
+    .location-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="status-badge" class="header-badge">📍 天気情報を読み込んでください</div>
+
+  <div class="recipe-image-container">
+    <span class="weather-tag" id="weather-tag">❓ 天気を取得してください</span>
+    <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80" alt="料理画像">
+  </div>
+
+  <h1>本日のフレッシュ食材で作る！<br>おすすめレシピ</h1>
+
+  <div class="ai-message" id="weather-message">
+    下のボタンを押して、現在の天気に合わせたアドバイスを表示させましょう！
+  </div>
+
+  <div class="cross-sell-section">
+    <div class="cross-sell-title">🛒 一緒に揃えてもっと美味しく！</div>
+    <ul class="item-list">
+      <li>
+        <span class="item-icon">🥩</span>
+        <span class="item-name">おすすめ食材</span>
+        <span class="item-location">売り場</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="recipe-details">
+    <h3>🍳 調理時間：--分</h3>
+    <p style="font-size: 0.85rem; color: #666; line-height: 1.6;">
+      ボタンを押すとレシピが表示されます。
+    </p>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <button class="location-btn" onclick="getWeather()">現在地の天気を読み込む</button>
+  </div>
+</div>
+
+<script>
+  const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
 
   // URLから ?item=xxx の値を取得（指定がなければ tomato）
   const urlParams = new URLSearchParams(window.location.search);
   const currentItem = urlParams.get('item') || 'tomato';
 
-  // 🍳 食材ごとのマルチレシピデータベース
+  // 食材ごとのマルチレシピデータベース
   const recipeDatabase = {
-    // --------------------------------------------------
-    // 🍅 トマトレシピ
-    // --------------------------------------------------
     tomato: {
       cold: [
         {
@@ -68,24 +277,20 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
         }
       ]
     },
-
-    // --------------------------------------------------
-    // 🍇 岡山産ブドウレシピ
-    // --------------------------------------------------
     grape: {
       cold: [
         {
           title: "岡山産ブドウとカマンベールのホットパイ",
           tag: "🍇 岡山直送！とろける甘み",
           image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=800&q=80",
-          message: "寒くなってきた大阪の夜に、岡山から届いた果汁たっぷりのブドウを温かいリッチなスウィーツで贅沢に楽しみませんか？",
+          message: "寒くなってきた大阪の夜に、岡山から届いた果汁たっぷりのブドウを温かいスウィーツで贅沢に楽しみませんか？",
           crossSell: [
             { icon: "🧀", name: "カマンベールチーズ", location: "乳製品コーナー" },
             { icon: "🥐", name: "冷凍パイシート", location: "冷凍食品コーナー" },
             { icon: "🍯", name: "はちみつ", location: "調味料コーナー" }
           ],
           time: "約20分",
-          steps: "1. パイシートにチーズと半分に切ったブドウを乗せる。<br>2. 200℃のトースターで15分香ばしく焼く。<br>3. 仕上げにはちみつをかけて完成！"
+          steps: "1. パイシートにチーズと半分に切ったブドウを乗せる。<br>2. 200℃のトースターで15分焼く。<br>3. はちみつをかけて完成！"
         }
       ],
       cool: [
@@ -95,12 +300,12 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
           image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
           message: "肌寒い日は、おうちでワインと楽しむおしゃれバル気分！岡山産の弾ける甘さと生ハムの塩気が相性抜群です。",
           crossSell: [
-            { icon: "🥓", name: "高級生ハム", location: "加工肉コーナー" },
+            { icon: "🥓", name: "生ハム", location: "加工肉コーナー" },
             { icon: "🧀", name: "クリームチーズ", location: "乳製品コーナー" },
-            { icon: "🍷", name: "おすすめ赤ワイン", location: "お酒売り場" }
+            { icon: "🍷", name: "赤ワイン", location: "お酒売り場" }
           ],
           time: "約8分",
-          steps: "1. ブドウを洗って半分にカット。<br>2. ベビーリーフの上に生ハムと一口大のチーズ、ブドウを散らす。<br>3. オリーブオイルと黒コショウを振って完成！"
+          steps: "1. ブドウを半分にカット。<br>2. リーフに生ハム、チーズ、ブドウを散らす。<br>3. オリーブオイルと黒コショウを振って完成！"
         }
       ],
       warm: [
@@ -108,14 +313,13 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
           title: "岡山産ブドウとマスカルポーネの冷製パフェ",
           tag: "🍇 岡山産ブドウのご褒美デザート",
           image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80",
-          message: "心地よい気候の今日は、岡山が誇る絶品ブドウを使ったフレッシュなパフェ感覚デザートでおうちカフェ！",
+          message: "心地よい気候の今日は、岡山が誇る絶品ブドウを使ったフレッシュなカフェ風デザート！",
           crossSell: [
-            { icon: "🍨", name: "マスカルポーネチーズ", location: "乳製品コーナー" },
-            { icon: "🥣", name: "フルーツグラノーラ", location: "パン・シリアル売り場" },
-            { icon: "🌿", name: "ミントの葉", location: "野菜売り場" }
+            { icon: "🍨", name: "マスカルポーネ", location: "乳製品コーナー" },
+            { icon: "🥣", name: "グラノーラ", location: "シリアル売り場" }
           ],
           time: "約5分",
-          steps: "1. グラス底にグラノーラを敷く。<br>2. 砂糖を混ぜたマスカルポーネとブドウを交互に重ねる。<br>3. ミントを乗せて冷やして完成！"
+          steps: "1. グラスにグラノーラを敷く。<br>2. チーズとブドウを重ねる。<br>3. ミントを乗せて冷やして完成！"
         }
       ],
       hot: [
@@ -123,14 +327,13 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
           title: "岡山産ブドウと生ハムの冷製カッペリーニ",
           tag: "🍇 ひんやり爽やかフルーツパスタ",
           image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
-          message: "大阪の暑い日にはコレ！岡山のジューシーなブドウのジューシーな甘みとレモンの酸味でサッパリ味わう贅沢ランチです。",
+          message: "大阪の暑い日にはコレ！岡山のジューシーなブドウの甘みとレモンの酸味でサッパリ味わう贅沢ランチです。",
           crossSell: [
-            { icon: "🍝", name: "カッペリーニ (極細麺)", location: "乾物コーナー" },
-            { icon: "🥓", name: "生ハム", location: "加工肉コーナー" },
-            { icon: "🍋", name: "ポッカレモン", location: "調味料コーナー" }
+            { icon: "🍝", name: "カッペリーニ", location: "乾物コーナー" },
+            { icon: "🥓", name: "生ハム", location: "加工肉コーナー" }
           ],
           time: "約10分",
-          steps: "1. 極細パスタを茹で、氷水でギュッと締める。<br>2. レモン汁、オリーブオイル、ブドウ、生ハムと和える。<br>3. キンキンに冷やした皿に盛り付けて完成！"
+          steps: "1. 極細パスタを茹でて氷水で締める。<br>2. レモン汁、オイル、ブドウ、生ハムと和える。<br>3. 盛り付けて完成！"
         }
       ]
     }
@@ -171,19 +374,16 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
           badge.style.backgroundColor = "#8ac926";
           badge.style.color = "#fff";
 
-          // 気温区分
           let category = "cool";
           if (temp < 10) category = "cold";
           else if (temp >= 10 && temp < 20) category = "cool";
           else if (temp >= 20 && temp < 30) category = "warm";
           else if (temp >= 30) category = "hot";
 
-          // 選択された食材(currentItem)が存在しなければトマトへ倒す
           const targetItemData = recipeDatabase[currentItem] || recipeDatabase['tomato'];
           const recipes = targetItemData[category] || targetItemData['cool'];
           const selectedRecipe = recipes[Math.floor(Math.random() * recipes.length)];
 
-          // 画面書き換え
           weatherTag.innerText = selectedRecipe.tag;
           document.querySelector('.recipe-image-container img').src = selectedRecipe.image;
           document.querySelector('h1').innerHTML = selectedRecipe.title;
@@ -217,3 +417,7 @@ const WEATHER_API_KEY = "48896af320b4902817ca48d02936e6f3";
       }
     );
   }
+</script>
+
+</body>
+</html>
